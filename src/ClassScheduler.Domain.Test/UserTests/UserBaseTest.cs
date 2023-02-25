@@ -1,5 +1,3 @@
-using ClassScheduler.Domain.Users;
-
 namespace ClassScheduler.Domain.Test.UserTests;
 
 [TestClass]
@@ -9,6 +7,7 @@ public class UserBaseTest
     private const string TestFirstName = "TestFirstName";
     private const string TestLastName = "TestLastName";
 
+
     private TestUser _user = null!;
 
     [TestInitialize]
@@ -17,6 +16,19 @@ public class UserBaseTest
         _user = new TestUser(TestFirstName, TestLastName, TestEmail);
     }
 
+    [TestMethod]
+    public void ConstructorSetsProperties()
+    {
+        Assert.AreEqual(TestFirstName, _user.FirstName);
+        Assert.AreEqual(TestLastName, _user.LastName);
+        Assert.AreEqual(TestEmail, _user.Email);
+    }
+
+    [TestMethod]
+    public void ConstructWithId()
+    {
+        _user = new TestUser(TestFirstName, TestLastName, TestEmail);
+    }
 
     [TestMethod]
     public void UpdateFirstName()
@@ -75,13 +87,3 @@ public class UserBaseTest
         Assert.ThrowsException<ArgumentException>(() => new TestUser(TestFirstName, "", TestEmail));
     }
 }
-
-
-public class TestUser : UserBase
-{
-    public TestUser(string firstName, string lastName, string email) 
-        : base(firstName, lastName, email)
-    {
-    }
-}
-
