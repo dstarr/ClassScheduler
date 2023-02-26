@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassScheduler.Domain.Test"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassScheduler.Data", "ClassScheduler.Data\ClassScheduler.Data.csproj", "{DC59BDD8-6BBD-4A99-BB15-05F749C0FBEB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassScheduler.Data.Test", "ClassScheduler.Data.Test\ClassScheduler.Data.Test.csproj", "{DF4F655C-63AB-40C6-9574-2B074BDA2711}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,12 +46,17 @@ Global
 		{DC59BDD8-6BBD-4A99-BB15-05F749C0FBEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC59BDD8-6BBD-4A99-BB15-05F749C0FBEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC59BDD8-6BBD-4A99-BB15-05F749C0FBEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF4F655C-63AB-40C6-9574-2B074BDA2711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF4F655C-63AB-40C6-9574-2B074BDA2711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF4F655C-63AB-40C6-9574-2B074BDA2711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF4F655C-63AB-40C6-9574-2B074BDA2711}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{983D26CB-6E53-4772-B3DE-B98F20302CA2} = {76357EB1-1CFC-4851-994F-3D90A7343402}
+		{DF4F655C-63AB-40C6-9574-2B074BDA2711} = {76357EB1-1CFC-4851-994F-3D90A7343402}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BA305164-9922-419D-8819-E4266DBC238A}
