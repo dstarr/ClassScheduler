@@ -19,4 +19,8 @@
     <ProjectReference Include="..\ClassScheduler.Domain\ClassScheduler.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EventTests\" />
+  </ItemGroup>
+
 </Project>
