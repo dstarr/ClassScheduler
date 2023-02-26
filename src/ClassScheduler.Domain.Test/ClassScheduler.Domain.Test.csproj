@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="EventTests\" />
+    <Folder Include="LearningEventTests\" />
   </ItemGroup>
 
 </Project>
