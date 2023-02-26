@@ -1,3 +1,5 @@
+using ClassScheduler.Domain.Entities;
+
 namespace ClassScheduler.Domain.Test.UserTests;
 
 public class TestUser : UserBase

@@ -1,4 +1,6 @@
-namespace ClassScheduler.Domain.Test.UserTests;
+using ClassScheduler.Domain.Test.UserTests;
+
+namespace ClassScheduler.Domain.Test.Fakes;
 
 [TestClass]
 public class UserBaseTest

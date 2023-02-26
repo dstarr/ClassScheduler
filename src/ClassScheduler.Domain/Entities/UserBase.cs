@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace ClassScheduler.Domain.Users;
+namespace ClassScheduler.Domain.Entities;
 
 public abstract class UserBase
 {
@@ -35,7 +35,7 @@ public abstract class UserBase
     public string Email { get; private set; }
 
     public Guid Id { get; private set; }
-    
+
     public void UpdateFirstName(string firstName)
     {
         FirstName = firstName;

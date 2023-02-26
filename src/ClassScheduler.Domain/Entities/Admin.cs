@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassScheduler.Domain.Users;
+namespace ClassScheduler.Domain.Entities;
 
-public class Instructor : UserBase
+public class Admin : UserBase
 {
-    public Instructor(string firstName, string lastName, string email) 
+    public Admin(string firstName, string lastName, string email)
         : base(firstName, lastName, email)
     {
-        
+
     }
 }

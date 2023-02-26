@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassScheduler.Domain.Users;
+namespace ClassScheduler.Domain.Entities;
 
 public class Student
 {

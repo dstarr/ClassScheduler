@@ -1,6 +1,6 @@
 ﻿using ClassScheduler.Domain.Events;
 
-namespace ClassScheduler.Domain.Test.EventsTests;
+namespace ClassScheduler.Domain.Test.EntityTests;
 
 [TestClass]
 public class LearningEventTest
@@ -28,7 +28,7 @@ public class LearningEventTest
             Title = "Title",
             StudentCapacity = 10
         };
-        
+
         var learningEvent = new LearningEvent(args);
     }
 
@@ -45,7 +45,7 @@ public class LearningEventTest
     {
         _learningEventArgs.StudentCapacity = 0;
 
-        Assert.ThrowsException<System.ArgumentOutOfRangeException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new LearningEvent(_learningEventArgs));
     }
 
     [TestMethod]
@@ -53,9 +53,9 @@ public class LearningEventTest
     {
         var learningEvent = new LearningEvent(_learningEventArgs);
 
-        Assert.ThrowsException<System.ArgumentOutOfRangeException>(() => learningEvent.UpdateStudentCapacity(0));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => learningEvent.UpdateStudentCapacity(0));
     }
-    
+
     [TestMethod]
     public void CanConstructWithId()
     {
@@ -65,7 +65,7 @@ public class LearningEventTest
     [TestMethod]
     public void CannotConstructWithNullLearningEventArgs()
     {
-        Assert.ThrowsException<System.ArgumentNullException>(() => new LearningEvent(null));
+        Assert.ThrowsException<ArgumentNullException>(() => new LearningEvent(null));
     }
 
     [TestMethod]
@@ -73,7 +73,7 @@ public class LearningEventTest
     {
         _learningEventArgs.StartTime = DateTime.Now.AddDays(-1);
 
-        Assert.ThrowsException<System.ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
     }
 
     [TestMethod]
@@ -81,7 +81,7 @@ public class LearningEventTest
     {
         _learningEventArgs.EndTime = DateTime.Now.AddDays(-1);
 
-        Assert.ThrowsException<System.ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
     }
 
     [TestMethod]
@@ -93,19 +93,19 @@ public class LearningEventTest
         _learningEventArgs.StartTime = newStartTime;
         _learningEventArgs.EndTime = newEndTime;
 
-        Assert.ThrowsException<System.ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
     }
 
     [TestMethod]
     public void CanUpdateStartAndEndDates()
     {
         var newStartTime = DateTime.Now.AddDays(10);
-        var newEndTime = DateTime.Now.AddDays(10+2);
+        var newEndTime = DateTime.Now.AddDays(10 + 2);
 
         var learningEvent = new LearningEvent(_learningEventArgs);
 
         learningEvent.UpdateStartAndEndTimes(newStartTime, newEndTime);
-        
+
         Assert.AreEqual(newStartTime, learningEvent.StartTime);
         Assert.AreEqual(newEndTime, learningEvent.EndTime);
     }
@@ -114,9 +114,9 @@ public class LearningEventTest
     public void TotalHoursMustBeGreaterThan0()
     {
         _learningEventArgs.TotalHours = 0;
-        
+
         // Act & Assert
-        Assert.ThrowsException<System.ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
     }
 
     [TestMethod]
@@ -125,27 +125,27 @@ public class LearningEventTest
         _learningEventArgs.TotalHours = 17;
 
         // Act & Assert
-        Assert.ThrowsException<System.ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
     }
 
     [TestMethod]
     public void TitleCannotBeNullOrEmpty()
     {
         _learningEventArgs.Title = null;
-        Assert.ThrowsException<System.ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
 
         _learningEventArgs.Title = string.Empty;
-        Assert.ThrowsException<System.ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
     }
 
     [TestMethod]
     public void DescriptionCannotBeNullOrEmpty()
     {
         _learningEventArgs.Description = null;
-        Assert.ThrowsException<System.ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
 
         _learningEventArgs.Description = string.Empty;
-        Assert.ThrowsException<System.ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
     }
 
     [TestMethod]
@@ -164,8 +164,8 @@ public class LearningEventTest
     {
         var learningEvent = new LearningEvent(_learningEventArgs);
 
-        Assert.ThrowsException<System.ArgumentException>(() => learningEvent.UpdateTitle(null));
-        Assert.ThrowsException<System.ArgumentException>(() => learningEvent.UpdateTitle(string.Empty));
+        Assert.ThrowsException<ArgumentException>(() => learningEvent.UpdateTitle(null));
+        Assert.ThrowsException<ArgumentException>(() => learningEvent.UpdateTitle(string.Empty));
     }
 
     [TestMethod]
@@ -173,8 +173,8 @@ public class LearningEventTest
     {
         var learningEvent = new LearningEvent(_learningEventArgs);
 
-        Assert.ThrowsException<System.ArgumentException>(() => learningEvent.UpdateDescription(null));
-        Assert.ThrowsException<System.ArgumentException>(() => learningEvent.UpdateDescription(string.Empty));
+        Assert.ThrowsException<ArgumentException>(() => learningEvent.UpdateDescription(null));
+        Assert.ThrowsException<ArgumentException>(() => learningEvent.UpdateDescription(string.Empty));
     }
 
     [TestMethod]
