@@ -6,6 +6,11 @@ public class LearningEvent
     {
         VerifyConstructorArguments(learningEventArgs);
 
+        if (learningEventArgs.Id.HasValue)
+        {
+            Id = learningEventArgs.Id.Value;
+        }
+
         Title = learningEventArgs.Title;
         Description = learningEventArgs.Description;
         StartTime = learningEventArgs.StartTime;
@@ -45,24 +50,12 @@ public class LearningEvent
         Description = description;
     }
 
-    public void UpdateStartTime(DateTime startDate)
+    public void UpdateStartAndEndTimes(DateTime startTime, DateTime endTime)
     {
-        if (startDate < DateTime.Now)
-        {
-            throw new ArgumentException("Start date cannot be in the past", nameof(startDate));
-        }
+        ValidateStartAndEndTimes(startTime, endTime);
 
-        StartTime = startDate;
-    }
-
-    public void UpdateEndTime(DateTime endDate)
-    {
-        if (endDate < DateTime.Now)
-        {
-            throw new ArgumentException("End date cannot be in the past", nameof(endDate));
-        }
-
-        EndTime = endDate;
+        StartTime = startTime;
+        EndTime = endTime;
     }
 
     public void UpdateTotalHours(int totalHours)
@@ -82,6 +75,14 @@ public class LearningEvent
 
     private static void VerifyConstructorArguments(LearningEventArgs args)
     {
+        if (args == null)
+        {
+            throw new ArgumentNullException("Args cannot be null");
+        }
+        
+        ValidateStartAndEndTimes(args.StartTime, args.EndTime);
+
+
         if (string.IsNullOrWhiteSpace(args.Title))
         {
             throw new ArgumentException("Title cannot be empty", nameof(args.Title));
@@ -92,7 +93,7 @@ public class LearningEvent
             throw new ArgumentException("Description cannot be empty", nameof(args.Description));
         }
 
-        if (args.TotalHours < 0)
+        if (args.TotalHours <= 0)
         {
             throw new ArgumentException("Total hours cannot be less than 0", nameof(args.TotalHours));
         }
@@ -101,16 +102,23 @@ public class LearningEvent
         {
             throw new ArgumentException("Total hours cannot be more than 16", nameof(args.TotalHours));
         }
+    }
 
-        if (args.StartTime < DateTime.Now)
+    private static void ValidateStartAndEndTimes(DateTime startTime, DateTime endTime)
+    {
+        if (startTime < DateTime.Now)
         {
-            throw new ArgumentException("Start date cannot be in the past", nameof(args.StartTime));
+            throw new ArgumentException("Start time cannot be in the past", nameof(startTime));
         }
 
-        if (args.EndTime < DateTime.Now)
+        if (endTime < DateTime.Now)
         {
-            throw new ArgumentException("End date cannot be in the past", nameof(args.EndTime));
+            throw new ArgumentException("End time cannot be in the past", nameof(endTime));
+        }
+
+        if (endTime < startTime)
+        {
+            throw new ArgumentException("End time cannot be before start date", nameof(endTime));
         }
     }
-    
 }

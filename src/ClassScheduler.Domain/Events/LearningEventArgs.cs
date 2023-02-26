@@ -3,9 +3,9 @@
 public class LearningEventArgs
 {
     public Guid? Id { get; init; }
-    public string Title { get; init; }
-    public string Description { get; init; }
-    public DateTime StartTime { get; init; }
-    public DateTime EndTime { get; init; }
-    public int TotalHours { get; init; }
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public int TotalHours { get; set; }
 }
