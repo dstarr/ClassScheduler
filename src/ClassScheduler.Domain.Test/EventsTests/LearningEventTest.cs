@@ -13,6 +13,7 @@ public class LearningEventTest
         Description = "Description",
         EndTime = DateTime.Now.AddDays(6),
         Title = "Title",
+        StudentCapacity = 10
     };
 
     [TestMethod]
@@ -25,11 +26,36 @@ public class LearningEventTest
             Description = "Description",
             EndTime = DateTime.Now.AddDays(6),
             Title = "Title",
+            StudentCapacity = 10
         };
         
         var learningEvent = new LearningEvent(args);
     }
 
+    [TestMethod]
+    public void CanUpdateStudentCapacity()
+    {
+        var learningEvent = new LearningEvent(_learningEventArgs);
+        learningEvent.UpdateStudentCapacity(20);
+        Assert.AreEqual(20, learningEvent.StudentCapacity);
+    }
+
+    [TestMethod]
+    public void CannotInitStudentCapacityBelow1()
+    {
+        _learningEventArgs.StudentCapacity = 0;
+
+        Assert.ThrowsException<System.ArgumentOutOfRangeException>(() => new LearningEvent(_learningEventArgs));
+    }
+
+    [TestMethod]
+    public void CannotUpdateStudentCapacityBelow1()
+    {
+        var learningEvent = new LearningEvent(_learningEventArgs);
+
+        Assert.ThrowsException<System.ArgumentOutOfRangeException>(() => learningEvent.UpdateStudentCapacity(0));
+    }
+    
     [TestMethod]
     public void CanConstructWithId()
     {

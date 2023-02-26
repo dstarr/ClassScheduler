@@ -1,27 +1,19 @@
-using System.Diagnostics;
 using ClassScheduler.Data.Dto;
-using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Extensions.Options;
 
-namespace ClassScheduler.Data.Test;
+namespace ClassScheduler.Data.Test.Integration;
 
 [TestClass]
 public class StudentDbTest
 {
-    private const string AccountKey = "cuDdgi38yi4abLAE8d9K1Wgi7rfNsGtOwSSjdaCxQDWKZTTLqKrwsjZnESYSiLq5txHf5yGIpIScACDbMc9V6Q==";
-    private const string AppName = "ClassSchedulerApp";
-    private const string ContainerName = "StudentDto";
     private const string DatabaseName = "ClassScheduler";
-    private const string EndpointUri = "https://class-scheduler-db.documents.azure.com:443/";
     private const string PartitionKey = "/id";
     private const string ConnectionString = "AccountEndpoint=https://class-scheduler-db.documents.azure.com:443/;AccountKey=cuDdgi38yi4abLAE8d9K1Wgi7rfNsGtOwSSjdaCxQDWKZTTLqKrwsjZnESYSiLq5txHf5yGIpIScACDbMc9V6Q==";
 
-    DbContextOptions<StudentDbContext> _options = null!;
+    private static DbContextOptions<StudentDbContext> _options = null!;
     
     [TestInitialize]
-    public async Task TestInitialize()
+    public void TestInitialize()
     {
         _options = new DbContextOptionsBuilder<StudentDbContext>()
             .UseCosmos(ConnectionString, DatabaseName)
@@ -75,7 +67,6 @@ public class StudentDbTest
 
         allStudents = await context.Students?.ToListAsync()!;
         Assert.AreEqual(0, allStudents.Count);
-
     }
 
     private static StudentDto CreateStudentDto()

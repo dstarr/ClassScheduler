@@ -11,12 +11,15 @@ public class LearningEvent
             Id = learningEventArgs.Id.Value;
         }
 
-        Title = learningEventArgs.Title;
         Description = learningEventArgs.Description;
-        StartTime = learningEventArgs.StartTime;
         EndTime = learningEventArgs.EndTime;
+        StartTime = learningEventArgs.StartTime;
+        StudentCapacity = learningEventArgs.StudentCapacity;
+        Title = learningEventArgs.Title;
         TotalHours = learningEventArgs.TotalHours;
     }
+
+    public int StudentCapacity { get; private set; }
 
     public Guid Id { get; private set; }
 
@@ -73,6 +76,14 @@ public class LearningEvent
         TotalHours = totalHours;
     }
 
+    public void UpdateStudentCapacity(int numberOfSeats)
+    {
+        if (numberOfSeats <= 0)
+            throw new ArgumentOutOfRangeException("Number of seats cannot be less than 0", nameof(numberOfSeats));
+
+        StudentCapacity = numberOfSeats;
+    }
+
     private static void VerifyConstructorArguments(LearningEventArgs args)
     {
         if (args == null)
@@ -101,6 +112,11 @@ public class LearningEvent
         if (args.TotalHours > 16)
         {
             throw new ArgumentException("Total hours cannot be more than 16", nameof(args.TotalHours));
+        }
+
+        if (args.StudentCapacity <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(args.StudentCapacity), "Student capacity cannot be less than 0");
         }
     }
 
