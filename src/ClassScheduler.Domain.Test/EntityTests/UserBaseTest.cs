@@ -15,7 +15,7 @@ public class UserBaseTest
     [TestInitialize]
     public void TestInitialize()
     {
-        _user = new TestUser(TestFirstName, TestLastName, TestEmail);
+        _user = new TestUser(Guid.NewGuid(), TestFirstName, TestLastName, TestEmail);
     }
 
     [TestMethod]
@@ -29,7 +29,7 @@ public class UserBaseTest
     [TestMethod]
     public void ConstructWithId()
     {
-        _user = new TestUser(TestFirstName, TestLastName, TestEmail);
+        _user = new TestUser(Guid.NewGuid(), TestFirstName,TestLastName, TestEmail);
     }
 
     [TestMethod]
@@ -74,18 +74,18 @@ public class UserBaseTest
     {
         const string badEmail = "david@starr";
 
-        Assert.ThrowsException<ArgumentException>(() => new TestUser(TestFirstName, TestLastName, badEmail));
+        Assert.ThrowsException<ArgumentException>(() => new TestUser(Guid.NewGuid(), TestFirstName, TestLastName, badEmail));
     }
 
     [TestMethod]
     public void FirstNameCannotBeEmpty()
     {
-        Assert.ThrowsException<ArgumentException>(() => new TestUser("", TestLastName, TestEmail));
+        Assert.ThrowsException<ArgumentException>(() => new TestUser(Guid.NewGuid(), string.Empty, TestLastName, TestEmail));
     }
 
     [TestMethod]
     public void LastNameCannotBeEmpty()
     {
-        Assert.ThrowsException<ArgumentException>(() => new TestUser(TestFirstName, "", TestEmail));
+        Assert.ThrowsException<ArgumentException>(() => new TestUser(Guid.NewGuid(), TestFirstName, string.Empty, TestEmail));
     }
 }

@@ -1,21 +1,11 @@
-﻿using ClassScheduler.Domain.Entities;
+﻿using System.Runtime.CompilerServices;
+using ClassScheduler.Domain.Entities;
 
 namespace ClassScheduler.Domain.Test.EntityTests;
 
 [TestClass]
 public class LearningEventTest
 {
-    private readonly LearningEventArgs _learningEventArgs = new LearningEventArgs()
-    {
-        Id = Guid.NewGuid(),
-        StartTime = DateTime.Now.AddDays(5),
-        TotalHours = 12,
-        Description = "Description",
-        EndTime = DateTime.Now.AddDays(6),
-        Title = "Title",
-        StudentCapacity = 10
-    };
-
     [TestMethod]
     public void CanConstructWithoutId()
     {
@@ -35,7 +25,8 @@ public class LearningEventTest
     [TestMethod]
     public void CanUpdateTotalHours()
     {
-        var learningEvent = new LearningEvent(_learningEventArgs);
+        var learningEvent = CreateNewLearningEvent();
+
         learningEvent.UpdateTotalHours(20);
         
         Assert.AreEqual(20, learningEvent.TotalHours);
@@ -44,7 +35,7 @@ public class LearningEventTest
     [TestMethod]
     public void CannotUpdateTotalHoursBelow1()
     {
-        var learningEvent = new LearningEvent(_learningEventArgs);
+        var learningEvent = CreateNewLearningEvent();
         
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => learningEvent.UpdateTotalHours(0));
 
@@ -53,7 +44,8 @@ public class LearningEventTest
     [TestMethod]
     public void CanUpdateStudentCapacity()
     {
-        var learningEvent = new LearningEvent(_learningEventArgs);
+        var learningEvent = CreateNewLearningEvent();
+        
         learningEvent.UpdateStudentCapacity(20);
         
         Assert.AreEqual(20, learningEvent.StudentCapacity);
@@ -62,15 +54,17 @@ public class LearningEventTest
     [TestMethod]
     public void CannotInitStudentCapacityBelow1()
     {
-        _learningEventArgs.StudentCapacity = 0;
+        var learningEventArgs = CreateNewLearningEventArgs();
+        
+        learningEventArgs.StudentCapacity = 0;
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => new LearningEvent(learningEventArgs));
     }
 
     [TestMethod]
     public void CannotUpdateStudentCapacityBelow1()
     {
-        var learningEvent = new LearningEvent(_learningEventArgs);
+        var learningEvent = CreateNewLearningEvent();
 
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => learningEvent.UpdateStudentCapacity(0));
     }
@@ -78,51 +72,59 @@ public class LearningEventTest
     [TestMethod]
     public void CanConstructWithId()
     {
-        var learningEvent = new LearningEvent(_learningEventArgs);
+        var learningEventArgs = CreateNewLearningEventArgs();
+
+        var learningEvent = new LearningEvent(learningEventArgs);
     }
 
     [TestMethod]
     public void CannotConstructWithNullLearningEventArgs()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => new LearningEvent(null));
+        Assert.ThrowsException<ArgumentNullException>(() => new LearningEvent(null!));
     }
 
     [TestMethod]
     public void StartDateCannotBeInThePast()
     {
-        _learningEventArgs.StartTime = DateTime.Now.AddDays(-1);
+        var learningEventArgs = CreateNewLearningEventArgs();
+        
+        learningEventArgs.StartTime = DateTime.Now.AddDays(-1);
 
-        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(learningEventArgs));
     }
 
     [TestMethod]
     public void EndDateCannotBeInThePast()
     {
-        _learningEventArgs.EndTime = DateTime.Now.AddDays(-1);
+        var learningEventArgs = CreateNewLearningEventArgs();
+        
+        learningEventArgs.EndTime = DateTime.Now.AddDays(-1);
 
-        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(learningEventArgs));
     }
 
     [TestMethod]
     public void StartDateMustBeBeforeEndDate()
     {
+        var learningEventArgs = CreateNewLearningEventArgs();
+
         var newStartTime = DateTime.Now.AddDays(3);
         var newEndTime = DateTime.Now;
 
-        _learningEventArgs.StartTime = newStartTime;
-        _learningEventArgs.EndTime = newEndTime;
+        learningEventArgs.StartTime = newStartTime;
+        learningEventArgs.EndTime = newEndTime;
 
-        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(learningEventArgs));
     }
 
     [TestMethod]
     public void CanUpdateStartAndEndDates()
     {
+        var learningEvent = CreateNewLearningEvent();
+
         var newStartTime = DateTime.Now.AddDays(10);
         var newEndTime = DateTime.Now.AddDays(10 + 2);
-
-        var learningEvent = new LearningEvent(_learningEventArgs);
-
+        
         learningEvent.UpdateStartAndEndTimes(newStartTime, newEndTime);
 
         Assert.AreEqual(newStartTime, learningEvent.StartTime);
@@ -132,45 +134,42 @@ public class LearningEventTest
     [TestMethod]
     public void TotalHoursMustBeGreaterThan0()
     {
-        _learningEventArgs.TotalHours = 0;
+        var learningEventArgs = CreateNewLearningEventArgs();
+
+        learningEventArgs.TotalHours = 0;
 
         // Act & Assert
-        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
-    }
-
-    [TestMethod]
-    public void TotalHoursMustBeLessThan17()
-    {
-        _learningEventArgs.TotalHours = 17;
-
-        // Act & Assert
-        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(learningEventArgs));
     }
 
     [TestMethod]
     public void TitleCannotBeNullOrEmpty()
     {
-        _learningEventArgs.Title = null;
-        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        var learningEventArgs = CreateNewLearningEventArgs();
 
-        _learningEventArgs.Title = string.Empty;
-        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        learningEventArgs.Title = null;
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(learningEventArgs));
+
+        learningEventArgs.Title = string.Empty;
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(learningEventArgs));
     }
 
     [TestMethod]
     public void DescriptionCannotBeNullOrEmpty()
     {
-        _learningEventArgs.Description = null;
-        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        var learningEventArgs = CreateNewLearningEventArgs();
 
-        _learningEventArgs.Description = string.Empty;
-        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(_learningEventArgs));
+        learningEventArgs.Description = null;
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(learningEventArgs));
+
+        learningEventArgs.Description = string.Empty;
+        Assert.ThrowsException<ArgumentException>(() => new LearningEvent(learningEventArgs));
     }
 
     [TestMethod]
     public void CanUpdateTitle()
     {
-        var learningEvent = new LearningEvent(_learningEventArgs);
+        var learningEvent = CreateNewLearningEvent();
 
         var newTitle = "New Title";
         learningEvent.UpdateTitle(newTitle);
@@ -181,8 +180,8 @@ public class LearningEventTest
     [TestMethod]
     public void CannotUpdateTitleWithNullOrEmpty()
     {
-        var learningEvent = new LearningEvent(_learningEventArgs);
-
+        var learningEvent = CreateNewLearningEvent();
+        
         Assert.ThrowsException<ArgumentException>(() => learningEvent.UpdateTitle(null));
         Assert.ThrowsException<ArgumentException>(() => learningEvent.UpdateTitle(string.Empty));
     }
@@ -190,20 +189,76 @@ public class LearningEventTest
     [TestMethod]
     public void CannotUpdateDescriptionWithNullOrEmpty()
     {
-        var learningEvent = new LearningEvent(_learningEventArgs);
+        var learningEvent = CreateNewLearningEvent();
 
         Assert.ThrowsException<ArgumentException>(() => learningEvent.UpdateDescription(null));
         Assert.ThrowsException<ArgumentException>(() => learningEvent.UpdateDescription(string.Empty));
     }
-
+    
     [TestMethod]
     public void CanUpdateDescription()
     {
-        var learningEvent = new LearningEvent(_learningEventArgs);
+        var learningEvent = CreateNewLearningEvent();
 
         var newDescription = "New Description";
         learningEvent.UpdateDescription(newDescription);
 
         Assert.AreEqual(newDescription, learningEvent.Description);
     }
+
+    [TestMethod]
+    public void CanAddStudent()
+    {
+        var learningEvent = CreateNewLearningEvent();
+        var student = CreateStudentWithId();
+        
+        Assert.AreEqual(0, learningEvent.Students.Count);
+
+        learningEvent.AddStudent(student);
+
+        Assert.AreEqual(1, learningEvent.Students.Count);
+    }
+
+
+    [TestMethod]
+    public void CanRemoveStudent()
+    {
+        var learningEvent = CreateNewLearningEvent();
+        var student = CreateStudentWithId();
+
+        Assert.AreEqual(0, learningEvent.Students.Count);
+
+        learningEvent.AddStudent(student);
+
+        Assert.AreEqual(1, learningEvent.Students.Count);
+
+        learningEvent.RemoveStudent(student);
+
+        Assert.AreEqual(0, learningEvent.Students.Count);
+
+    }
+
+    private LearningEvent CreateNewLearningEvent()
+    {
+        return new LearningEvent(CreateNewLearningEventArgs());
+    }
+
+    private LearningEventArgs CreateNewLearningEventArgs()
+    {
+        return new LearningEventArgs()
+        {
+            Id = Guid.NewGuid(),
+            StartTime = DateTime.Now.AddDays(5),
+            TotalHours = 12,
+            Description = "Description",
+            EndTime = DateTime.Now.AddDays(6),
+            Title = "Title",
+            StudentCapacity = 10
+        };
+    }
+    private static Student CreateStudentWithId()
+    {
+        return new Student(Guid.NewGuid(), "Jane", "Doe", "jane@test.com");
+    }
+
 }

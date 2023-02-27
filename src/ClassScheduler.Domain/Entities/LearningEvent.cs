@@ -1,7 +1,12 @@
-﻿namespace ClassScheduler.Domain.Entities;
+﻿using System.Linq;
+
+
+namespace ClassScheduler.Domain.Entities;
 
 public class LearningEvent
 {
+    private readonly List<Student> _students = new();
+
     public LearningEvent(LearningEventArgs learningEventArgs)
     {
         VerifyConstructorArguments(learningEventArgs);
@@ -32,6 +37,8 @@ public class LearningEvent
     public DateTime EndTime { get; private set; }
 
     public int TotalHours { get; private set; }
+
+    public IReadOnlyCollection<Student> Students => _students.AsReadOnly();
 
     public void UpdateTitle(string title)
     {
@@ -104,11 +111,6 @@ public class LearningEvent
             throw new ArgumentException("Total hours cannot be less than 0", nameof(args.TotalHours));
         }
 
-        if (args.TotalHours > 16)
-        {
-            throw new ArgumentException("Total hours cannot be more than 16", nameof(args.TotalHours));
-        }
-
         if (args.StudentCapacity <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(args.StudentCapacity), "Student capacity cannot be less than 0");
@@ -131,5 +133,15 @@ public class LearningEvent
         {
             throw new ArgumentException("End time cannot be before start date", nameof(endTime));
         }
+    }
+
+    public void AddStudent(Student student)
+    {
+        _students.Add(student);
+    }
+
+    public void RemoveStudent(Student student)
+    {
+        _students.Remove(student);
     }
 }

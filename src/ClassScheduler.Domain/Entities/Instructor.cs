@@ -2,9 +2,8 @@
 
 public class Instructor : UserBase
 {
-    public Instructor(string firstName, string lastName, string email)
-        : base(firstName, lastName, email)
+    public Instructor(Guid id, string firstName, string lastName, string email) : 
+        base(id, firstName, lastName, email)
     {
-
     }
 }

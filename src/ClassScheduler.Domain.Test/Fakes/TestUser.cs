@@ -4,8 +4,8 @@ namespace ClassScheduler.Domain.Test.Fakes;
 
 public class TestUser : UserBase
 {
-    public TestUser(string firstName, string lastName, string email)
-        : base(firstName, lastName, email)
+    public TestUser(Guid id, string firstName, string lastName, string email)
+        : base(id, firstName, lastName, email)
     {
     }
 
