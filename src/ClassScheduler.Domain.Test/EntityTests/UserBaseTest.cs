@@ -1,6 +1,6 @@
-using ClassScheduler.Domain.Test.EntityTests;
+using ClassScheduler.Domain.Test.Fakes;
 
-namespace ClassScheduler.Domain.Test.Fakes;
+namespace ClassScheduler.Domain.Test.EntityTests;
 
 [TestClass]
 public class UserBaseTest
