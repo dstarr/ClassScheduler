@@ -1,14 +1,15 @@
+using ClassScheduler.Data.DbContexts;
 using ClassScheduler.Data.Dto;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClassScheduler.Data.Test.Integration;
+namespace ClassScheduler.Data.Test.Integration.Contexts;
 
 [TestClass]
-public class StudentDbTest: DbTestBase
+public class StudentDbTest : DbTestBase
 {
     private static DbContextOptions<StudentDbContext> _options = null!;
-    
+
     [TestInitialize]
     public void TestInitialize()
     {
@@ -21,7 +22,7 @@ public class StudentDbTest: DbTestBase
     public async Task TestCleanup()
     {
         var client = new CosmosClient(ConnectionString);
-    
+
         var container = client.GetContainer(DatabaseName, "StudentDbContext");
         await container.DeleteContainerAsync();
     }
@@ -41,13 +42,13 @@ public class StudentDbTest: DbTestBase
         Assert.IsNotNull(result1);
 
         result1.FirstName = "Jane";
-        
+
         context.Students?.Update(result1);
         await context.SaveChangesAsync();
 
         var result2 = context.Students?.FirstOrDefaultAsync(s => s.Id == student.Id).Result;
         Assert.IsNotNull(result2);
-        
+
         Assert.AreEqual("Jane", student.FirstName);
 
         context.Students?.Remove(result2);
@@ -70,7 +71,7 @@ public class StudentDbTest: DbTestBase
 
         context.Students.Remove(student);
         await context.SaveChangesAsync();
-        
+
         Assert.AreEqual(0, context.Students.Count());
     }
 

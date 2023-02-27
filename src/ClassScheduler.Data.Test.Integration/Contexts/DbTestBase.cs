@@ -1,7 +1,7 @@
 using System.Configuration;
 using Microsoft.Extensions.Configuration;
 
-namespace ClassScheduler.Data.Test.Integration;
+namespace ClassScheduler.Data.Test.Integration.Contexts;
 
 public class DbTestBase
 {

@@ -16,5 +16,5 @@ public class LearningEventDto
 
     public int TotalHours { get; set; }
 
-    public List<StudentDto> Students { get; set; } = null!;
+    public List<string> StudentIds { get; set; } = null!;
 }

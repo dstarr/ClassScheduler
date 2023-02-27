@@ -1,7 +1,7 @@
 ﻿using ClassScheduler.Data.Dto;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClassScheduler.Data;
+namespace ClassScheduler.Data.DbContexts;
 
 public class StudentDbContext : DbContext
 {
@@ -9,5 +9,5 @@ public class StudentDbContext : DbContext
 
     public StudentDbContext(DbContextOptions<StudentDbContext> options)
         : base(options)
-    {}
+    { }
 }

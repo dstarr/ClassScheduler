@@ -1,9 +1,9 @@
-﻿using ClassScheduler.Data.Dto;
-using ClassScheduler.Domain.Entities;
+﻿using ClassScheduler.Data.DbContexts;
+using ClassScheduler.Data.Dto;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClassScheduler.Data.Test.Integration;
+namespace ClassScheduler.Data.Test.Integration.Contexts;
 
 [TestClass]
 public class LearningEventDbContextTest : DbTestBase
@@ -26,8 +26,7 @@ public class LearningEventDbContextTest : DbTestBase
         var container = client.GetContainer(DatabaseName, "LearningEventDbContext");
         await container.DeleteContainerAsync();
     }
-
-
+    
     [TestMethod]
     public async Task CanAddAndRemoveLearningEvent()
     {
@@ -49,10 +48,18 @@ public class LearningEventDbContextTest : DbTestBase
 
     private LearningEventDto CreateNewLearningEventDto()
     {
+
+        var studentIds = new List<string>()
+        {
+            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString(),
+        };
+
         return new LearningEventDto()
         {
             Id = Guid.NewGuid(),
-            Students = new List<StudentDto>(),
+            StudentIds = studentIds,
             Description = "Description",
             EndTime = DateTime.Now.AddDays(5),
             StartTime = DateTime.Now.AddDays(3),
