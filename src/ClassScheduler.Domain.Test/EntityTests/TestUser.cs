@@ -1,6 +1,6 @@
 using ClassScheduler.Domain.Entities;
 
-namespace ClassScheduler.Domain.Test.UserTests;
+namespace ClassScheduler.Domain.Test.EntityTests;
 
 public class TestUser : UserBase
 {

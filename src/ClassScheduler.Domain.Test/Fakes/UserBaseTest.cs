@@ -1,4 +1,4 @@
-using ClassScheduler.Domain.Test.UserTests;
+using ClassScheduler.Domain.Test.EntityTests;
 
 namespace ClassScheduler.Domain.Test.Fakes;
 

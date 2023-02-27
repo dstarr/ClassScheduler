@@ -1,4 +1,4 @@
-﻿using ClassScheduler.Domain.Events;
+﻿using ClassScheduler.Domain.Entities;
 
 namespace ClassScheduler.Domain.Test.EntityTests;
 
@@ -33,10 +33,29 @@ public class LearningEventTest
     }
 
     [TestMethod]
+    public void CanUpdateTotalHours()
+    {
+        var learningEvent = new LearningEvent(_learningEventArgs);
+        learningEvent.UpdateTotalHours(20);
+        
+        Assert.AreEqual(20, learningEvent.TotalHours);
+    }
+
+    [TestMethod]
+    public void CannotUpdateTotalHoursBelow1()
+    {
+        var learningEvent = new LearningEvent(_learningEventArgs);
+        
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => learningEvent.UpdateTotalHours(0));
+
+    }
+
+    [TestMethod]
     public void CanUpdateStudentCapacity()
     {
         var learningEvent = new LearningEvent(_learningEventArgs);
         learningEvent.UpdateStudentCapacity(20);
+        
         Assert.AreEqual(20, learningEvent.StudentCapacity);
     }
 

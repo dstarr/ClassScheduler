@@ -1,4 +1,4 @@
-﻿namespace ClassScheduler.Domain.Events;
+﻿namespace ClassScheduler.Domain.Entities;
 
 public class LearningEventArgs
 {

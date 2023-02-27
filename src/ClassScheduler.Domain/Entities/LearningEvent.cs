@@ -1,4 +1,4 @@
-﻿namespace ClassScheduler.Domain.Events;
+﻿namespace ClassScheduler.Domain.Entities;
 
 public class LearningEvent
 {
@@ -63,14 +63,9 @@ public class LearningEvent
 
     public void UpdateTotalHours(int totalHours)
     {
-        if (totalHours < 0)
+        if (totalHours <= 0)
         {
-            throw new ArgumentException("Total hours cannot be less than 0", nameof(TotalHours));
-        }
-
-        if (totalHours > 16)
-        {
-            throw new ArgumentException("Total hours cannot be more than 16", nameof(TotalHours));
+            throw new ArgumentOutOfRangeException("Total hours cannot be less than 1", nameof(TotalHours));
         }
 
         TotalHours = totalHours;
@@ -79,7 +74,7 @@ public class LearningEvent
     public void UpdateStudentCapacity(int numberOfSeats)
     {
         if (numberOfSeats <= 0)
-            throw new ArgumentOutOfRangeException("Number of seats cannot be less than 0", nameof(numberOfSeats));
+            throw new ArgumentOutOfRangeException("Number of seats cannot be less than 1", nameof(numberOfSeats));
 
         StudentCapacity = numberOfSeats;
     }
@@ -90,7 +85,7 @@ public class LearningEvent
         {
             throw new ArgumentNullException("Args cannot be null");
         }
-        
+
         ValidateStartAndEndTimes(args.StartTime, args.EndTime);
 
 
