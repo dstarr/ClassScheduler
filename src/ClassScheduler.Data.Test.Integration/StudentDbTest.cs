@@ -4,12 +4,10 @@ using Microsoft.EntityFrameworkCore;
 namespace ClassScheduler.Data.Test.Integration;
 
 [TestClass]
-public class StudentDbTest
+public class StudentDbTest: DbTestBase
 {
-    private const string DatabaseName = "ClassScheduler";
     private const string PartitionKey = "/id";
-    private const string ConnectionString = "AccountEndpoint=https://class-scheduler-db.documents.azure.com:443/;AccountKey=cuDdgi38yi4abLAE8d9K1Wgi7rfNsGtOwSSjdaCxQDWKZTTLqKrwsjZnESYSiLq5txHf5yGIpIScACDbMc9V6Q==";
-
+    
     private static DbContextOptions<StudentDbContext> _options = null!;
     
     [TestInitialize]
