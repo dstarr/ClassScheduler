@@ -8,7 +8,8 @@ public class DbTestBase
     internal static string ConnectionString = null!;
     internal static string DatabaseName = null!;
 
-    
+    internal const string PartitionKey = "/id";
+
     public DbTestBase()
     {
         var configurationBuilder = new ConfigurationBuilder()

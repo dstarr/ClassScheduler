@@ -1,4 +1,5 @@
 using ClassScheduler.Data.Dto;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClassScheduler.Data.Test.Integration;
@@ -6,8 +7,6 @@ namespace ClassScheduler.Data.Test.Integration;
 [TestClass]
 public class StudentDbTest: DbTestBase
 {
-    private const string PartitionKey = "/id";
-    
     private static DbContextOptions<StudentDbContext> _options = null!;
     
     [TestInitialize]
@@ -16,6 +15,15 @@ public class StudentDbTest: DbTestBase
         _options = new DbContextOptionsBuilder<StudentDbContext>()
             .UseCosmos(ConnectionString, DatabaseName)
             .Options;
+    }
+
+    [TestCleanup]
+    public async Task TestCleanup()
+    {
+        var client = new CosmosClient(ConnectionString);
+    
+        var container = client.GetContainer(DatabaseName, "StudentDbContext");
+        await container.DeleteContainerAsync();
     }
 
     [TestMethod]
@@ -57,19 +65,18 @@ public class StudentDbTest: DbTestBase
         context.Students.Add(student);
         await context.SaveChangesAsync();
 
-        var allStudents = await context.Students?.ToListAsync()!;
-        Assert.AreEqual(1, allStudents.Count);
+        var allStudents = await context.Students.ToListAsync()!;
+        Assert.AreEqual(1, context.Students.Count());
 
         context.Students.Remove(student);
         await context.SaveChangesAsync();
-
-        allStudents = await context.Students?.ToListAsync()!;
-        Assert.AreEqual(0, allStudents.Count);
+        
+        Assert.AreEqual(0, context.Students.Count());
     }
 
     private static StudentDto CreateStudentDto()
     {
-        var student = new StudentDto
+        return new StudentDto
         {
             Id = Guid.NewGuid(),
             FirstName = "John",
@@ -77,6 +84,5 @@ public class StudentDbTest: DbTestBase
             Email = "test@test.com",
             PartitionKey = PartitionKey
         };
-        return student;
     }
 }
