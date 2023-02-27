@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using ClassScheduler.Domain.Exceptions;
 
 
 namespace ClassScheduler.Domain.Entities;
@@ -137,6 +138,11 @@ public class LearningEvent
 
     public void AddStudent(Student student)
     {
+        if (_students.Count >= StudentCapacity)
+        {
+            throw new TooManyStudentsException();
+        }
+
         _students.Add(student);
     }
 

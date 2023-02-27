@@ -1,11 +1,24 @@
 ﻿using System.Runtime.CompilerServices;
 using ClassScheduler.Domain.Entities;
+using ClassScheduler.Domain.Exceptions;
 
 namespace ClassScheduler.Domain.Test.EntityTests;
 
 [TestClass]
 public class LearningEventTest
 {
+    [TestMethod]
+    public void CannotAddMoreStudentsWhenAtCapacity()
+    {
+        var learningEvent = CreateNewLearningEvent();
+
+        learningEvent.UpdateStudentCapacity(2);
+        learningEvent.AddStudent(CreateStudent());
+        learningEvent.AddStudent(CreateStudent());
+
+        Assert.ThrowsException<TooManyStudentsException>(() => learningEvent.AddStudent(CreateStudent()));
+    }
+
     [TestMethod]
     public void CanConstructWithoutId()
     {
@@ -38,7 +51,6 @@ public class LearningEventTest
         var learningEvent = CreateNewLearningEvent();
         
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => learningEvent.UpdateTotalHours(0));
-
     }
 
     [TestMethod]
@@ -210,7 +222,7 @@ public class LearningEventTest
     public void CanAddStudent()
     {
         var learningEvent = CreateNewLearningEvent();
-        var student = CreateStudentWithId();
+        var student = CreateStudent();
         
         Assert.AreEqual(0, learningEvent.Students.Count);
 
@@ -224,7 +236,7 @@ public class LearningEventTest
     public void CanRemoveStudent()
     {
         var learningEvent = CreateNewLearningEvent();
-        var student = CreateStudentWithId();
+        var student = CreateStudent();
 
         Assert.AreEqual(0, learningEvent.Students.Count);
 
@@ -256,7 +268,7 @@ public class LearningEventTest
             StudentCapacity = 10
         };
     }
-    private static Student CreateStudentWithId()
+    private static Student CreateStudent()
     {
         return new Student(Guid.NewGuid(), "Jane", "Doe", "jane@test.com");
     }
