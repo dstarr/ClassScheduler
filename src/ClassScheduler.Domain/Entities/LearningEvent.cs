@@ -17,6 +17,8 @@ public class LearningEvent
             Id = learningEventArgs.Id.Value;
         }
 
+        _students = learningEventArgs.Students;
+
         Description = learningEventArgs.Description;
         EndTime = learningEventArgs.EndTime;
         StartTime = learningEventArgs.StartTime;

@@ -48,7 +48,6 @@ public class LearningEventDbContextTest : DbTestBase
 
     private LearningEventDto CreateNewLearningEventDto()
     {
-
         var studentIds = new List<string>()
         {
             Guid.NewGuid().ToString(),
@@ -67,7 +66,5 @@ public class LearningEventDbContextTest : DbTestBase
             Title = "Title",
             TotalHours = 12
         };
-
-
     }
 }

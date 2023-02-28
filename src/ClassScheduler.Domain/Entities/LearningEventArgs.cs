@@ -9,4 +9,5 @@ public class LearningEventArgs
     public DateTime EndTime { get; set; }
     public int TotalHours { get; set; }
     public int StudentCapacity { get; set; }
+    public List<Student> Students { get; set; } = null!;
 }

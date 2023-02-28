@@ -265,7 +265,8 @@ public class LearningEventTest
             Description = "Description",
             EndTime = DateTime.Now.AddDays(6),
             Title = "Title",
-            StudentCapacity = 10
+            StudentCapacity = 10,
+            Students = new List<Student>()
         };
     }
     private static Student CreateStudent()
