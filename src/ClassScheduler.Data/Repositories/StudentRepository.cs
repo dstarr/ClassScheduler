@@ -1,28 +1,69 @@
-﻿namespace ClassScheduler.Data.Repositories;
-public class StudentRepository<T> : IRepository<T> where T : class
+﻿using ClassScheduler.Data.DbContexts;
+using ClassScheduler.Data.Dto;
+using ClassScheduler.Data.Mappers;
+using ClassScheduler.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace ClassScheduler.Data.Repositories;
+
+public class StudentRepository : IRepository<Student>
 {
-    public void Add(T entity)
+    private readonly StudentDbContext _dbContext;
+    private readonly DbSet<StudentDto> _dbSet;
+
+    private readonly IEntityDtoMapper<Student, StudentDto> _mapper = new StudentMapper();
+
+    public StudentRepository(StudentDbContext dbContext)
     {
-        throw new NotImplementedException();
+        _dbContext = dbContext;
+        _dbSet = _dbContext.Set<StudentDto>();
+    }
+    
+    public async Task AddAsync(Student entity)
+    {
+        var dto = _mapper.MapEntityToDto(entity);
+
+        await _dbSet.AddAsync(dto);
     }
 
-    public void Update(T entity)
+    public void Update(Student entity)
     {
-        throw new NotImplementedException();
+        var dto = _mapper.MapEntityToDto(entity);
+
+        _dbSet.Update(dto);
     }
 
-    public void Delete(T entity)
+    public void Remove(Student entity)
     {
-        throw new NotImplementedException();
+        var dto = _mapper.MapEntityToDto(entity);
+
+        _dbSet.Remove(dto);
     }
 
-    public T GetById(Guid id)
+    public async Task<Student> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var dto = await _dbSet.FindAsync(id);
+
+        return _mapper.MapDtoToEntity(dto);
     }
 
-    public IEnumerable<T> GetAll()
+    public async Task<IEnumerable<Student>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        var students = new List<Student>();
+
+        var dtos = await _dbSet.ToListAsync();
+
+        foreach (var dto in dtos)
+        {
+            var student = _mapper.MapDtoToEntity(dto);
+            students.Add(student);
+        }
+
+        return students;
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _dbContext.SaveChangesAsync();
     }
 }

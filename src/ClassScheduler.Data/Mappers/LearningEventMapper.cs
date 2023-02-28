@@ -4,7 +4,7 @@ using Guid = System.Guid;
 
 namespace ClassScheduler.Data.Mappers;
 
-public class LearningEventMapper
+public class LearningEventMapper : IEntityDtoMapper<LearningEvent, LearningEventDto>
 {
     public LearningEvent MapDtoToEntity(LearningEventDto dto)
     {
@@ -38,6 +38,4 @@ public class LearningEventMapper
             TotalHours = entity.TotalHours
         };
     }
-
-
 }
