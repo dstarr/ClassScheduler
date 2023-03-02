@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClassScheduler.Data.Repositories;
 
-public class StudentRepository : IRepository<Student>
+public class StudentRepository : IStudentRepository
 {
     private readonly StudentDbContext _dbContext;
     private readonly DbSet<StudentDto> _dbSet;
@@ -51,7 +51,7 @@ public class StudentRepository : IRepository<Student>
     {
         var students = new List<Student>();
 
-        var dtos = await _dbSet.ToListAsync();
+        var dtos = await _dbContext.Students.ToListAsync();
 
         foreach (var dto in dtos)
         {

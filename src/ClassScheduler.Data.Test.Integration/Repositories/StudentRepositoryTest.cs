@@ -1,11 +1,5 @@
-﻿    using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ClassScheduler.Data.DbContexts;
+﻿using ClassScheduler.Data.DbContexts;
 using ClassScheduler.Data.Repositories;
-using ClassScheduler.Data.Test.Integration;
 using ClassScheduler.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,14 +13,18 @@ public class StudentRepositoryTest : DbTestBase
     [TestInitialize]
     public void TestInitialize()
     {
-        var options = new DbContextOptionsBuilder<StudentDbContext>()
-            .UseCosmos(ConnectionString, DatabaseName)
-            .Options;
-
-        var dbContext = new StudentDbContext(options);
+        var dbContext = new StudentDbContext(CosmosOptions);
         _studentRepository = new StudentRepository(dbContext);
     }
 
+    [TestMethod]
+    public async Task CanGetAllAsync()
+    {
+        var students = await _studentRepository.GetAllAsync();
+
+        Assert.IsNotNull(students);
+    }
+    
     [TestMethod]
     public async Task AddAsync_Student_AddsStudent()
     {

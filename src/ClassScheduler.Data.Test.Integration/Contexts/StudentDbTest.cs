@@ -1,5 +1,6 @@
 using ClassScheduler.Data.DbContexts;
 using ClassScheduler.Data.Dto;
+using ClassScheduler.Domain.Entities;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,30 @@ public class StudentDbTest : DbTestBase
 
         var container = client.GetContainer(DatabaseName, "StudentDbContext");
         await container.DeleteContainerAsync();
+    }
+
+    [TestMethod]
+    public async Task CanRetrieveAllStudents()
+    {
+        await using var context = new StudentDbContext(_options);
+        await context.Database.EnsureCreatedAsync();
+        // await context.Database.EnsureDeletedAsync();
+
+        await context.Students.AddAsync(CreateStudentDto());
+        await context.Students.AddAsync(CreateStudentDto());
+        await context.Students.AddAsync(CreateStudentDto());
+        await context.SaveChangesAsync();
+
+        Assert.AreEqual(3, context.Students.Count());
+
+        await foreach (var student in context.Students)
+        {
+            context.Students.Remove(student);
+        }
+        
+        await context.SaveChangesAsync();
+        
+        Assert.AreEqual(0, context.Students.Count());
     }
 
     [TestMethod]
