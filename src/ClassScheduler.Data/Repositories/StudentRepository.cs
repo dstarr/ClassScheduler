@@ -9,49 +9,64 @@ namespace ClassScheduler.Data.Repositories;
 public class StudentRepository : IStudentRepository
 {
     private readonly StudentDbContext _dbContext;
-    private readonly DbSet<StudentDto> _dbSet;
 
     private readonly IEntityDtoMapper<Student, StudentDto> _mapper = new StudentMapper();
 
     public StudentRepository(StudentDbContext dbContext)
     {
         _dbContext = dbContext;
-        _dbSet = _dbContext.Set<StudentDto>();
+        _dbContext.Database.EnsureCreatedAsync();
     }
     
-    public async Task AddAsync(Student entity)
+    public async Task<Student> AddAsync(Student entity)
     {
         var dto = _mapper.MapEntityToDto(entity);
 
-        await _dbSet.AddAsync(dto);
+        var studentDto = await _dbContext.Students.AddAsync(dto);
+        await _dbContext.SaveChangesAsync();
+        
+        var student = _mapper.MapDtoToEntity(studentDto.Entity);
+
+        return student;
     }
 
-    public void Update(Student entity)
+    public async Task<Student> UpdateAsync(Student entity)
     {
         var dto = _mapper.MapEntityToDto(entity);
 
-        _dbSet.Update(dto);
+        var studentDto = _dbContext.Students.Update(dto).Entity;
+        await _dbContext.SaveChangesAsync();
+
+        var student = _mapper.MapDtoToEntity(studentDto);
+
+        return student;
+
     }
 
-    public void Remove(Student entity)
+    public async Task<Student> RemoveAsync(Student entity)
     {
         var dto = _mapper.MapEntityToDto(entity);
 
-        _dbSet.Remove(dto);
+        var studentDto = _dbContext.Students.Remove(dto).Entity;
+        await _dbContext.SaveChangesAsync();
+
+        var student = _mapper.MapDtoToEntity(studentDto);
+
+        return student;
     }
 
     public async Task<Student> GetByIdAsync(Guid id)
     {
-        var dto = await _dbSet.FindAsync(id);
+        var dto = await _dbContext.Students.FindAsync(id);
 
         return _mapper.MapDtoToEntity(dto);
     }
 
-    public async Task<IEnumerable<Student>> GetAllAsync()
+    public IList<Student> GetAll()
     {
         var students = new List<Student>();
 
-        var dtos = await _dbContext.Students.ToListAsync();
+        var dtos = _dbContext.Students;
 
         foreach (var dto in dtos)
         {
@@ -60,10 +75,5 @@ public class StudentRepository : IStudentRepository
         }
 
         return students;
-    }
-
-    public async Task SaveChangesAsync()
-    {
-        await _dbContext.SaveChangesAsync();
     }
 }

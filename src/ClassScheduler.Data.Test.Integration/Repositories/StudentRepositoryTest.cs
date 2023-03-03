@@ -1,6 +1,7 @@
 ﻿using ClassScheduler.Data.DbContexts;
 using ClassScheduler.Data.Repositories;
 using ClassScheduler.Domain.Entities;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClassScheduler.Data.Test.Integration.Repositories;
@@ -14,13 +15,23 @@ public class StudentRepositoryTest : DbTestBase
     public void TestInitialize()
     {
         var dbContext = new StudentDbContext(CosmosOptions);
+        
         _studentRepository = new StudentRepository(dbContext);
     }
 
-    [TestMethod]
-    public async Task CanGetAllAsync()
+    [TestCleanup]
+    public async Task TestCleanup()
     {
-        var students = await _studentRepository.GetAllAsync();
+        var client = new CosmosClient(ConnectionString);
+
+        var container = client.GetContainer(DatabaseName, "StudentDbContext");
+        await container.DeleteContainerAsync();
+    }
+
+    [TestMethod]
+    public void CanGetAllAsync()
+    {
+        var students = _studentRepository.GetAll();
 
         Assert.IsNotNull(students);
     }
@@ -30,18 +41,19 @@ public class StudentRepositoryTest : DbTestBase
     {
         var student = CreateStudent();
 
-        await _studentRepository.AddAsync(student);
-        // await _studentRepository.SaveChangesAsync();
+        var students = _studentRepository.GetAll();
+        Assert.AreEqual(0, students.Count());
 
-        var students = await _studentRepository.GetAllAsync();
+        await _studentRepository.AddAsync(student);
+
+        students = _studentRepository.GetAll();
 
         Assert.AreEqual(1, students.Count());
 
         foreach (var studentFromDb in students)
         {
-            _studentRepository.Remove(studentFromDb);
+            await _studentRepository.RemoveAsync(studentFromDb);
         }
-        await _studentRepository.SaveChangesAsync();
     }
 
     [TestMethod]
@@ -50,8 +62,7 @@ public class StudentRepositoryTest : DbTestBase
         var student = CreateStudent();
 
         await _studentRepository.AddAsync(student);
-        await _studentRepository.SaveChangesAsync();
-
+        
         var studentFromDb = await _studentRepository.GetByIdAsync(student.Id);
 
         Assert.IsNotNull(studentFromDb);
@@ -66,7 +77,7 @@ public class StudentRepositoryTest : DbTestBase
 
         student.UpdateFirstName("Updated First Name");
 
-        _studentRepository.Update(student);
+        await _studentRepository.UpdateAsync(student);
 
         var studentFromDb = await _studentRepository.GetByIdAsync(student.Id);
 
@@ -80,9 +91,7 @@ public class StudentRepositoryTest : DbTestBase
 
         await _studentRepository.AddAsync(student);
 
-        _studentRepository.Remove(student);
-
-        await _studentRepository.SaveChangesAsync();
+        await _studentRepository.RemoveAsync(student);
 
         var studentFromDb = await _studentRepository.GetByIdAsync(student.Id);
 
