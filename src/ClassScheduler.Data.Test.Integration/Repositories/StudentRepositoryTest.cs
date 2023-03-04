@@ -3,17 +3,35 @@ using ClassScheduler.Data.Repositories;
 using ClassScheduler.Domain.Entities;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace ClassScheduler.Data.Test.Integration.Repositories;
 
 [TestClass]
-public class StudentRepositoryTest : DbTestBase
+public class StudentRepositoryTest // : DbTestBase
 {
     private StudentRepository _studentRepository = null!;
+
+
+    internal static string ConnectionString = null!;
+    internal static string DatabaseName = null!;
+    internal DbContextOptions<StudentDbContext> CosmosOptions = null!;
 
     [TestInitialize]
     public void TestInitialize()
     {
+        var configurationBuilder = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+        IConfiguration configuration = configurationBuilder.Build();
+
+        ConnectionString = configuration.GetSection("ConnectionString").Value ?? throw new InvalidOperationException();
+        DatabaseName = configuration.GetSection("DatabaseName").Value ?? throw new InvalidOperationException();
+
+        CosmosOptions = new DbContextOptionsBuilder<StudentDbContext>()
+            .UseCosmos(ConnectionString, DatabaseName)
+            .Options;
+ 
         var dbContext = new StudentDbContext(CosmosOptions);
         
         _studentRepository = new StudentRepository(dbContext);
@@ -42,18 +60,13 @@ public class StudentRepositoryTest : DbTestBase
         var student = CreateStudent();
 
         var students = _studentRepository.GetAll();
-        Assert.AreEqual(0, students.Count());
+        var initCountOfStudents = students.Count();
 
         await _studentRepository.AddAsync(student);
 
         students = _studentRepository.GetAll();
 
-        Assert.AreEqual(1, students.Count());
-
-        foreach (var studentFromDb in students)
-        {
-            await _studentRepository.RemoveAsync(studentFromDb);
-        }
+        Assert.AreEqual(initCountOfStudents + 1, students.Count());
     }
 
     [TestMethod]

@@ -20,12 +20,12 @@ public class StudentRepository : IStudentRepository
     
     public async Task<Student> AddAsync(Student entity)
     {
-        var dto = _mapper.MapEntityToDto(entity);
+        var toDto = _mapper.MapEntityToDto(entity);
 
-        var studentDto = await _dbContext.Students.AddAsync(dto);
+        var fromDto = (await _dbContext.Students.AddAsync(toDto)).Entity;
         await _dbContext.SaveChangesAsync();
         
-        var student = _mapper.MapDtoToEntity(studentDto.Entity);
+        var student = _mapper.MapDtoToEntity(fromDto);
 
         return student;
     }
@@ -45,12 +45,12 @@ public class StudentRepository : IStudentRepository
 
     public async Task<Student> RemoveAsync(Student entity)
     {
-        var dto = _mapper.MapEntityToDto(entity);
+        var toDto = _mapper.MapEntityToDto(entity);
 
-        var studentDto = _dbContext.Students.Remove(dto).Entity;
+        var fromDto = _dbContext.Students.Remove(toDto).Entity;
         await _dbContext.SaveChangesAsync();
 
-        var student = _mapper.MapDtoToEntity(studentDto);
+        var student = _mapper.MapDtoToEntity(fromDto);
 
         return student;
     }
