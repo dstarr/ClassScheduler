@@ -7,6 +7,8 @@ public class StudentMapper : IEntityDtoMapper<Student, StudentDto>
 {
     public Student MapDtoToEntity(StudentDto dto)
     {
+        if (dto == null) throw new ArgumentNullException();
+
         return new Student(dto.Id, dto.FirstName, dto.LastName, dto.Email);
     }
 

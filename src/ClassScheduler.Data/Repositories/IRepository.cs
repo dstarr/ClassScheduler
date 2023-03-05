@@ -10,9 +10,9 @@ namespace ClassScheduler.Data.Repositories;
 
 public interface IRepository<T> where T : class
 {
-    Task<Student> AddAsync(T entity);
-    Task<Student> UpdateAsync(T entity);
-    Task<Student> RemoveAsync(T entity);
+    Task<T> AddAsync(T entity);
+    void Update(T entity);
+    Task RemoveAsync(T entity);
     Task<T> GetByIdAsync(Guid id);
     IList<Student> GetAll();
 }

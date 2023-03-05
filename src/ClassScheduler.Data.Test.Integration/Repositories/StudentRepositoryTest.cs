@@ -1,4 +1,5 @@
-﻿using ClassScheduler.Data.DbContexts;
+﻿using System.Security.Cryptography.X509Certificates;
+using ClassScheduler.Data.DbContexts;
 using ClassScheduler.Data.Repositories;
 using ClassScheduler.Domain.Entities;
 using Microsoft.Azure.Cosmos;
@@ -16,6 +17,7 @@ public class StudentRepositoryTest // : DbTestBase
     internal static string ConnectionString = null!;
     internal static string DatabaseName = null!;
     internal DbContextOptions<StudentDbContext> CosmosOptions = null!;
+    private StudentDbContext _dbContext;
 
     [TestInitialize]
     public void TestInitialize()
@@ -32,18 +34,16 @@ public class StudentRepositoryTest // : DbTestBase
             .UseCosmos(ConnectionString, DatabaseName)
             .Options;
  
-        var dbContext = new StudentDbContext(CosmosOptions);
-        
-        _studentRepository = new StudentRepository(dbContext);
+        _dbContext = new StudentDbContext(CosmosOptions);
+        _dbContext.Database.EnsureCreatedAsync();
+
+        _studentRepository = new StudentRepository(_dbContext);
     }
 
     [TestCleanup]
-    public async Task TestCleanup()
+    public void TestCleanup()
     {
-        var client = new CosmosClient(ConnectionString);
-
-        var container = client.GetContainer(DatabaseName, "StudentDbContext");
-        await container.DeleteContainerAsync();
+        _dbContext.Dispose();
     }
 
     [TestMethod]
@@ -84,17 +84,19 @@ public class StudentRepositoryTest // : DbTestBase
     [TestMethod]
     public async Task Update_Student_UpdatesStudent()
     {
+        const string updatedFirstName = "Updated First Name";
+        
         var student = CreateStudent();
 
         await _studentRepository.AddAsync(student);
 
-        student.UpdateFirstName("Updated First Name");
+        student.UpdateFirstName(updatedFirstName);
 
-        await _studentRepository.UpdateAsync(student);
+        _studentRepository.Update(student);
 
         var studentFromDb = await _studentRepository.GetByIdAsync(student.Id);
 
-        Assert.AreEqual(student.FirstName, studentFromDb.FirstName);
+        Assert.AreEqual(updatedFirstName, studentFromDb.FirstName);
     }
 
     [TestMethod]
@@ -103,6 +105,7 @@ public class StudentRepositoryTest // : DbTestBase
         var student = CreateStudent();
 
         await _studentRepository.AddAsync(student);
+        await _dbContext.SaveChangesAsync();
 
         await _studentRepository.RemoveAsync(student);
 

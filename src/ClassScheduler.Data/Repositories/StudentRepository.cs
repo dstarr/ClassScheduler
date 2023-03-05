@@ -16,8 +16,9 @@ public class StudentRepository : IStudentRepository
     {
         _dbContext = dbContext;
         _dbContext.Database.EnsureCreatedAsync();
+        
     }
-    
+
     public async Task<Student> AddAsync(Student entity)
     {
         var toDto = _mapper.MapEntityToDto(entity);
@@ -30,35 +31,35 @@ public class StudentRepository : IStudentRepository
         return student;
     }
 
-    public async Task<Student> UpdateAsync(Student entity)
+    public void Update(Student student)
     {
-        var dto = _mapper.MapEntityToDto(entity);
+        var dto = _dbContext.Students.FirstOrDefault(u => u.Id == student.Id);
 
-        var studentDto = _dbContext.Students.Update(dto).Entity;
-        await _dbContext.SaveChangesAsync();
+        if (dto == null) return;
 
-        var student = _mapper.MapDtoToEntity(studentDto);
-
-        return student;
+        dto.FirstName = student.FirstName;
+        dto.LastName = student.LastName;
+        dto.Email = student.Email;
+        
+        _dbContext.SaveChanges();
 
     }
 
-    public async Task<Student> RemoveAsync(Student entity)
+    public async Task RemoveAsync(Student entity)
     {
-        var toDto = _mapper.MapEntityToDto(entity);
+        var dto = _dbContext.Students.FirstOrDefault(u => u.Id == entity.Id);
+        if (dto == null) return;
 
-        var fromDto = _dbContext.Students.Remove(toDto).Entity;
+        _dbContext.Students.Remove(dto);
         await _dbContext.SaveChangesAsync();
-
-        var student = _mapper.MapDtoToEntity(fromDto);
-
-        return student;
     }
 
     public async Task<Student> GetByIdAsync(Guid id)
     {
-        var dto = await _dbContext.Students.FindAsync(id);
+        var dto = await _dbContext.Students.FirstOrDefaultAsync(s => s.Id == id);
 
+        if (dto == null) throw new ArgumentOutOfRangeException();
+        
         return _mapper.MapDtoToEntity(dto);
     }
 
@@ -66,7 +67,7 @@ public class StudentRepository : IStudentRepository
     {
         var students = new List<Student>();
 
-        var dtos = _dbContext.Students;
+        var dtos = _dbContext.Students.ToList();
 
         foreach (var dto in dtos)
         {
