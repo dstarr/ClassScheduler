@@ -26,6 +26,8 @@ public class StudentDbTest : DbTestBase
 
         var container = client.GetContainer(DatabaseName, "StudentDbContext");
         await container.DeleteContainerAsync();
+
+        client.Dispose();
     }
 
     [TestMethod]

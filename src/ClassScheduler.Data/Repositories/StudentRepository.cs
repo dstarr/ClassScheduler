@@ -16,7 +16,6 @@ public class StudentRepository : IStudentRepository
     {
         _dbContext = dbContext;
         _dbContext.Database.EnsureCreatedAsync();
-        
     }
 
     public async Task<Student> AddAsync(Student entity)
@@ -58,8 +57,8 @@ public class StudentRepository : IStudentRepository
     {
         var dto = await _dbContext.Students.FirstOrDefaultAsync(s => s.Id == id);
 
-        if (dto == null) throw new ArgumentOutOfRangeException();
-        
+        if (dto == null) return null!;
+
         return _mapper.MapDtoToEntity(dto);
     }
 

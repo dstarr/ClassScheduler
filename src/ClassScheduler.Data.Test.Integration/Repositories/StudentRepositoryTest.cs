@@ -105,7 +105,6 @@ public class StudentRepositoryTest // : DbTestBase
         var student = CreateStudent();
 
         await _studentRepository.AddAsync(student);
-        await _dbContext.SaveChangesAsync();
 
         await _studentRepository.RemoveAsync(student);
 
