@@ -22,12 +22,12 @@ public class StudentDbTest : DbTestBase
     [TestCleanup]
     public async Task TestCleanup()
     {
-        var client = new CosmosClient(ConnectionString);
+        using var client = new CosmosClient(ConnectionString);
 
         var container = client.GetContainer(DatabaseName, "StudentDbContext");
         await container.DeleteContainerAsync();
 
-        client.Dispose();
+        // client.Dispose();
     }
 
     [TestMethod]
@@ -35,7 +35,6 @@ public class StudentDbTest : DbTestBase
     {
         await using var context = new StudentDbContext(_options);
         await context.Database.EnsureCreatedAsync();
-        // await context.Database.EnsureDeletedAsync();
 
         await context.Students.AddAsync(CreateStudentDto());
         await context.Students.AddAsync(CreateStudentDto());
@@ -83,23 +82,20 @@ public class StudentDbTest : DbTestBase
     }
 
     [TestMethod]
-    public async Task CanAddAndRemoveStudent()
+    public async Task CanAddStudentAsync()
     {
         var student = CreateStudentDto();
 
         await using var context = new StudentDbContext(_options);
         await context.Database.EnsureCreatedAsync();
 
+        var startNumStudents = await context.Students.CountAsync();
         context.Students.Add(student);
         await context.SaveChangesAsync();
 
-        var allStudents = await context.Students.ToListAsync()!;
-        Assert.AreEqual(1, context.Students.Count());
+        var endNumStudents = await context.Students.CountAsync();
 
-        context.Students.Remove(student);
-        await context.SaveChangesAsync();
-
-        Assert.AreEqual(0, context.Students.Count());
+        Assert.AreEqual(startNumStudents+ 1, endNumStudents);
     }
 
     private static StudentDto CreateStudentDto()

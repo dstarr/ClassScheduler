@@ -14,5 +14,5 @@ public interface IRepository<T> where T : class
     void Update(T entity);
     Task RemoveAsync(T entity);
     Task<T> GetByIdAsync(Guid id);
-    IList<Student> GetAll();
+    Task<IList<Student>> GetAllAsync();
 }

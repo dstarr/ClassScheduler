@@ -17,7 +17,7 @@ public class StudentRepositoryTest // : DbTestBase
     internal static string ConnectionString = null!;
     internal static string DatabaseName = null!;
     internal DbContextOptions<StudentDbContext> CosmosOptions = null!;
-    private StudentDbContext _dbContext;
+    private StudentDbContext _dbContext = null!;
 
     [TestInitialize]
     public void TestInitialize()
@@ -41,15 +41,21 @@ public class StudentRepositoryTest // : DbTestBase
     }
 
     [TestCleanup]
-    public void TestCleanup()
+    public async Task TestCleanup()
     {
-        _dbContext.Dispose();
+        using var client = new CosmosClient(ConnectionString);
+        
+        var container = client.GetContainer(DatabaseName, "StudentDbContext");
+        await container.DeleteContainerAsync();
+
+        await _dbContext.DisposeAsync();
+        
     }
 
     [TestMethod]
-    public void CanGetAllAsync()
+    public async Task CanGetAllAsync()
     {
-        var students = _studentRepository.GetAll();
+        var students = (await _studentRepository.GetAllAsync()).ToList();
 
         Assert.IsNotNull(students);
     }
@@ -59,16 +65,15 @@ public class StudentRepositoryTest // : DbTestBase
     {
         var student = CreateStudent();
 
-        var students = _studentRepository.GetAll();
-        var initCountOfStudents = students.Count();
+        var initCountOfStudents = _dbContext.Students.Count();
 
         await _studentRepository.AddAsync(student);
 
-        students = _studentRepository.GetAll();
-
-        Assert.AreEqual(initCountOfStudents + 1, students.Count());
+        var finalNumStudents = _dbContext.Students.Count();
+        
+        Assert.AreEqual(initCountOfStudents + 1, finalNumStudents);
     }
-
+        
     [TestMethod]
     public async Task GetByIdAsync_Student_ReturnsStudent()
     {

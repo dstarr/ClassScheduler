@@ -41,7 +41,6 @@ public class StudentRepository : IStudentRepository
         dto.Email = student.Email;
         
         _dbContext.SaveChanges();
-
     }
 
     public async Task RemoveAsync(Student entity)
@@ -62,11 +61,11 @@ public class StudentRepository : IStudentRepository
         return _mapper.MapDtoToEntity(dto);
     }
 
-    public IList<Student> GetAll()
+    public async Task<IList<Student>> GetAllAsync()
     {
         var students = new List<Student>();
 
-        var dtos = _dbContext.Students.ToList();
+        var dtos = await _dbContext.Students.ToListAsync();
 
         foreach (var dto in dtos)
         {
