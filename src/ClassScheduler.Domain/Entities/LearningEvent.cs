@@ -6,7 +6,7 @@ namespace ClassScheduler.Domain.Entities;
 
 public class LearningEvent
 {
-    private readonly List<Student> _students = new();
+    private readonly List<Student> _students;
 
     public LearningEvent(LearningEventArgs learningEventArgs)
     {
@@ -17,7 +17,7 @@ public class LearningEvent
             Id = learningEventArgs.Id.Value;
         }
 
-        _students = learningEventArgs.Students;
+        _students = learningEventArgs.Students == null ? new List<Student>() : learningEventArgs.Students.ToList();
 
         Description = learningEventArgs.Description;
         EndTime = learningEventArgs.EndTime;

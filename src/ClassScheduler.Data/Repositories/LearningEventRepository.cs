@@ -45,7 +45,11 @@ public class LearningEventRepository : ILearningEventRepository
 
     public void Remove(LearningEvent entity)
     {
-        throw new NotImplementedException();
+        var dto = _dbContext.LearningEvents.FirstOrDefault(u => u.Id == entity.Id);
+
+        if (dto == null) return;
+
+        _dbContext.LearningEvents.Remove(dto);
     }
 
 

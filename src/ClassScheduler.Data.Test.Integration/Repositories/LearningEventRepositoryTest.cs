@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Runtime.CompilerServices;
 using ClassScheduler.Data.DbContexts;
 using ClassScheduler.Data.Repositories;
 using ClassScheduler.Domain.Entities;
@@ -37,6 +38,8 @@ public class LearningEventRepositoryTest : DbTestBase
 
         await _learningEventDbContext.DisposeAsync();
         await _learningEventRepository.DisposeAsync();
+        
+        
     }
 
     [TestMethod]
@@ -76,7 +79,7 @@ public class LearningEventRepositoryTest : DbTestBase
     }
 
     [TestMethod]
-    public async Task CanUpdateLearningEventAsync()
+    public async Task CanRemoveLearningEventAsync()
     {
         // arrange
         var learningEvent = CreateLearningEvent();
@@ -85,7 +88,38 @@ public class LearningEventRepositoryTest : DbTestBase
         await _learningEventRepository.SaveChangesAsync();
 
         // act
-        learningEvent.UpdateTitle("Updated Title");
+        _learningEventRepository.Remove(learningEvent);
+        await _learningEventRepository.SaveChangesAsync();
+
+        // assert
+        var learningEventFromDb = await _learningEventRepository.GetByIdAsync(learningEvent.Id);
+
+        Assert.IsNull(learningEventFromDb);
+    }
+
+
+    [TestMethod]
+    public async Task CanUpdateLearningEventAsync()
+    {
+        // arrange
+        var startTime = DateTime.Now.AddDays(2);
+        var endTime = DateTime.Now.AddDays(3);
+        const string updatedTitle = "Updated Title";
+        const string updatedDescription = "Updated Description";
+        
+        var learningEvent = CreateLearningEvent();
+
+        await _learningEventRepository.AddAsync(learningEvent);
+        await _learningEventRepository.SaveChangesAsync();
+
+        // act
+        
+        learningEvent.UpdateTitle(updatedTitle);
+        learningEvent.UpdateDescription(updatedDescription);
+        learningEvent.UpdateStartAndEndTimes(startTime, endTime);
+        learningEvent.UpdateStudentCapacity(20);
+        learningEvent.UpdateTotalHours(20);
+
         _learningEventRepository.Update(learningEvent);
         await _learningEventRepository.SaveChangesAsync();
 
@@ -94,7 +128,12 @@ public class LearningEventRepositoryTest : DbTestBase
 
         Assert.IsNotNull(learningEventFromDb);
         Assert.AreEqual(learningEvent.Id, learningEventFromDb.Id);
-        Assert.AreEqual("Updated Title", learningEventFromDb.Title);
+        Assert.AreEqual(updatedTitle, learningEventFromDb.Title);
+        Assert.AreEqual(updatedDescription, learningEventFromDb.Description);
+        Assert.AreEqual(startTime, learningEventFromDb.StartTime);
+        Assert.AreEqual(endTime, learningEventFromDb.EndTime);
+        Assert.AreEqual(20, learningEventFromDb.StudentCapacity);
+        Assert.AreEqual(20, learningEventFromDb.TotalHours);
     }
 
     [TestMethod]
@@ -130,6 +169,7 @@ public class LearningEventRepositoryTest : DbTestBase
         };
 
         return new LearningEvent(learningEventArgs)
-        {};
+        { };
     }
+
 }

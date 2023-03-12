@@ -26,7 +26,7 @@ public class LearningEventDbContextTest : DbTestBase
         var container = client.GetContainer(DatabaseName, "LearningEvents");
         await container.DeleteContainerAsync();
     }
-    
+
     [TestMethod]
     public async Task CanAddAndRemoveLearningEvent()
     {
@@ -42,11 +42,9 @@ public class LearningEventDbContextTest : DbTestBase
 
         context.LearningEvents.Remove(learningEventDto);
         await context.SaveChangesAsync();
-        
+
         Assert.AreEqual(0, context.LearningEvents.Count());
     }
-
-    
 
     [TestMethod]
     public async Task CanUpdateLearningEventAsync()
@@ -81,7 +79,7 @@ public class LearningEventDbContextTest : DbTestBase
         await context.SaveChangesAsync();
 
         Assert.AreEqual(1, context.LearningEvents.Count());
-        
+
         context.LearningEvents.Remove(learningEventDto);
         await context.SaveChangesAsync();
 
@@ -90,14 +88,14 @@ public class LearningEventDbContextTest : DbTestBase
 
     private LearningEventDto CreateNewLearningEventDto()
     {
-        var studentIds = new List<string>()
+        var studentIds = new List<string>
         {
             Guid.NewGuid().ToString(),
             Guid.NewGuid().ToString(),
-            Guid.NewGuid().ToString(),
+            Guid.NewGuid().ToString()
         };
 
-        return new LearningEventDto()
+        return new LearningEventDto
         {
             Id = Guid.NewGuid(),
             StudentIds = studentIds,
