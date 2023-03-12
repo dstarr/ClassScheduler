@@ -8,6 +8,6 @@ public class LearningEventArgs
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public int TotalHours { get; set; }
-    public int StudentCapacity { get; set; }
+    public int MaxStudents { get; set; }
     public List<Student> Students { get; set; } = null!;
 }

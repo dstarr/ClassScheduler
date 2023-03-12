@@ -9,9 +9,6 @@ public class DbTestBase
 {
     internal static string ConnectionString = null!;
     internal static string DatabaseName = null!;
-    internal DbContextOptions<StudentDbContext> CosmosOptions = null!;
-
-    internal const string PartitionKey = "/id";
 
     public DbTestBase()
     {
@@ -23,9 +20,7 @@ public class DbTestBase
         ConnectionString = configuration.GetSection("ConnectionString").Value ?? throw new InvalidOperationException();
         DatabaseName = configuration.GetSection("DatabaseName").Value ?? throw new InvalidOperationException();
 
-        CosmosOptions = new DbContextOptionsBuilder<StudentDbContext>()
-            .UseCosmos(ConnectionString, DatabaseName)
-            .Options;
+
     }
 
 }

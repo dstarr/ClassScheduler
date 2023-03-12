@@ -4,9 +4,9 @@ using Guid = System.Guid;
 
 namespace ClassScheduler.Data.Mappers;
 
-public class LearningEventMapper : IEntityDtoMapper<LearningEvent, LearningEventDto>
+public static class LearningEventMapper
 {
-    public LearningEvent MapDtoToEntity(LearningEventDto dto)
+    public static LearningEvent MapDtoToEntity(LearningEventDto dto)
     {
         var args = new LearningEventArgs()
         {
@@ -14,7 +14,7 @@ public class LearningEventMapper : IEntityDtoMapper<LearningEvent, LearningEvent
             EndTime = dto.EndTime,
             Id = dto.Id,
             StartTime = dto.StartTime,
-            StudentCapacity = dto.StudentCapacity,
+            MaxStudents = dto.StudentCapacity,
             Title = dto.Title,
             TotalHours = dto.TotalHours,
         };
@@ -22,7 +22,7 @@ public class LearningEventMapper : IEntityDtoMapper<LearningEvent, LearningEvent
         return new LearningEvent(args);
     }
 
-    public LearningEventDto MapEntityToDto(LearningEvent entity)
+    public static LearningEventDto MapEntityToDto(LearningEvent entity)
     {
         var studentIds = entity.Students.Select(student => student.Id.ToString()).ToList();
 

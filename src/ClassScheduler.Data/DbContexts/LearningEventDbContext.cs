@@ -9,4 +9,12 @@ public class LearningEventDbContext : DbContext
 
     public LearningEventDbContext(DbContextOptions<LearningEventDbContext> options) : base(options)
     { }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<LearningEventDto>()
+            .ToContainer("LearningEvents")
+            .HasNoDiscriminator()
+            .HasKey(x => x.Id);
+    }
 }

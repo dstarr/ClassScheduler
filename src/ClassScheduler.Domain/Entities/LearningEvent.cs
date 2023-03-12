@@ -22,7 +22,7 @@ public class LearningEvent
         Description = learningEventArgs.Description;
         EndTime = learningEventArgs.EndTime;
         StartTime = learningEventArgs.StartTime;
-        StudentCapacity = learningEventArgs.StudentCapacity;
+        StudentCapacity = learningEventArgs.MaxStudents;
         Title = learningEventArgs.Title;
         TotalHours = learningEventArgs.TotalHours;
     }
@@ -114,9 +114,9 @@ public class LearningEvent
             throw new ArgumentException("Total hours cannot be less than 0", nameof(args.TotalHours));
         }
 
-        if (args.StudentCapacity <= 0)
+        if (args.MaxStudents <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(args.StudentCapacity), "Student capacity cannot be less than 0");
+            throw new ArgumentOutOfRangeException(nameof(args.MaxStudents), "Student capacity cannot be less than 0");
         }
     }
 

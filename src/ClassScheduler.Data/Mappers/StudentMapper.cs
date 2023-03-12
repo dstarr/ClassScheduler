@@ -3,16 +3,16 @@ using ClassScheduler.Domain.Entities;
 
 namespace ClassScheduler.Data.Mappers;
 
-public class StudentMapper : IEntityDtoMapper<Student, StudentDto>
+public static class StudentMapper
 {
-    public Student MapDtoToEntity(StudentDto dto)
+    public static Student MapDtoToEntity(StudentDto dto)
     {
         if (dto == null) throw new ArgumentNullException();
 
         return new Student(dto.Id, dto.FirstName, dto.LastName, dto.Email);
     }
 
-    public StudentDto MapEntityToDto(Student entity)
+    public static StudentDto MapEntityToDto(Student entity)
     {
         return new StudentDto()
         {

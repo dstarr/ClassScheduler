@@ -106,8 +106,7 @@ public class StudentDbContextTest : DbTestBase
             Id = Guid.NewGuid(),
             FirstName = "John",
             LastName = "Doe",
-            Email = "test@test.com",
-            PartitionKey = PartitionKey
+            Email = "test@test.com"
         };
     }
 }

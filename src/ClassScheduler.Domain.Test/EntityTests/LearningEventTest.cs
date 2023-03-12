@@ -29,7 +29,7 @@ public class LearningEventTest
             Description = "Description",
             EndTime = DateTime.Now.AddDays(6),
             Title = "Title",
-            StudentCapacity = 10
+            MaxStudents = 10
         };
 
         var learningEvent = new LearningEvent(args);
@@ -68,7 +68,7 @@ public class LearningEventTest
     {
         var learningEventArgs = CreateNewLearningEventArgs();
         
-        learningEventArgs.StudentCapacity = 0;
+        learningEventArgs.MaxStudents = 0;
 
         Assert.ThrowsException<ArgumentOutOfRangeException>(() => new LearningEvent(learningEventArgs));
     }
@@ -265,7 +265,7 @@ public class LearningEventTest
             Description = "Description",
             EndTime = DateTime.Now.AddDays(6),
             Title = "Title",
-            StudentCapacity = 10,
+            MaxStudents = 10,
             Students = new List<Student>()
         };
     }

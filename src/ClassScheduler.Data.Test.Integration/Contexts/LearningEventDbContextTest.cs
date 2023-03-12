@@ -23,7 +23,7 @@ public class LearningEventDbContextTest : DbTestBase
     {
         var client = new CosmosClient(ConnectionString);
 
-        var container = client.GetContainer(DatabaseName, "LearningEventDbContext");
+        var container = client.GetContainer(DatabaseName, "LearningEvents");
         await container.DeleteContainerAsync();
     }
     
