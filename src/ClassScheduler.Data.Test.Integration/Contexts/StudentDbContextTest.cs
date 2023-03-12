@@ -24,7 +24,7 @@ public class StudentDbContextTest : DbTestBase
     {
         using var client = new CosmosClient(ConnectionString);
 
-        var container = client.GetContainer(DatabaseName, "StudentDbContext");
+        var container = client.GetContainer(DatabaseName, "Students");
         await container.DeleteContainerAsync();
 
         // client.Dispose();

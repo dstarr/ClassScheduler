@@ -37,7 +37,7 @@ public class StudentRepositoryTest : DbTestBase
     }
 
     [TestMethod]
-    public async Task CanGetAllAsync()
+    public async Task CanGetStudentsAllAsync()
     {
         var students = (await _studentRepository.GetAllAsync()).ToList();
 
@@ -45,7 +45,7 @@ public class StudentRepositoryTest : DbTestBase
     }
     
     [TestMethod]
-    public async Task AddAsync_Student_AddsStudent()
+    public async Task CanAddStudentAsync()
     {
         var student = CreateStudent();
 
@@ -60,7 +60,7 @@ public class StudentRepositoryTest : DbTestBase
     }
         
     [TestMethod]
-    public async Task GetByIdAsync_Student_ReturnsStudent()
+    public async Task CanGetStudentByIdAsync()
     {
         var student = CreateStudent();
 
@@ -73,7 +73,7 @@ public class StudentRepositoryTest : DbTestBase
     }
 
     [TestMethod]
-    public async Task Update_Student_UpdatesStudent()
+    public async Task CanUpdateStudentAsync()
     {
         
         var student = CreateStudent();
@@ -91,7 +91,7 @@ public class StudentRepositoryTest : DbTestBase
     }
 
     [TestMethod]
-    public async Task Remove_Student_RemovesStudent()
+    public async Task CanRemoveStudentAsync()
     {
         var student = CreateStudent();
 
@@ -104,7 +104,7 @@ public class StudentRepositoryTest : DbTestBase
         Assert.IsNull(studentFromDb);
     }
 
-    private Student CreateStudent()
+    private static Student CreateStudent()
     {
         return new Student(Guid.NewGuid(), "FirstName", "LastName", "test@test.com");
     }
