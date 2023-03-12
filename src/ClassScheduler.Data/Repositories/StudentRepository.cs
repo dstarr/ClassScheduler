@@ -75,4 +75,9 @@ public class StudentRepository : IStudentRepository
 
         return students;
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _dbContext.DisposeAsync();
+    }
 }

@@ -10,4 +10,12 @@ public class StudentDbContext : DbContext
     public StudentDbContext(DbContextOptions<StudentDbContext> options)
         : base(options)
     { }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<StudentDto>()
+            .ToContainer("Students")
+            .HasNoDiscriminator()
+            .HasKey(s => s.Id);
+    }
 }

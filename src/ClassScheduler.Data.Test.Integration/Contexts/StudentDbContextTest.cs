@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ClassScheduler.Data.Test.Integration.Contexts;
 
 [TestClass]
-public class StudentDbTest : DbTestBase
+public class StudentDbContextTest : DbTestBase
 {
     private static DbContextOptions<StudentDbContext> _options = null!;
 
@@ -79,6 +79,8 @@ public class StudentDbTest : DbTestBase
 
         context.Students?.Remove(result2);
         await context.SaveChangesAsync();
+
+        await context.DisposeAsync();
     }
 
     [TestMethod]

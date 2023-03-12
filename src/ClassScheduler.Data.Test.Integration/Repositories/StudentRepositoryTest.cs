@@ -9,47 +9,31 @@ using Microsoft.Extensions.Configuration;
 namespace ClassScheduler.Data.Test.Integration.Repositories;
 
 [TestClass]
-public class StudentRepositoryTest // : DbTestBase
+public class StudentRepositoryTest : DbTestBase
 {
+    private StudentDbContext _studentDbContext = null!;
+
     private StudentRepository _studentRepository = null!;
 
-
-    internal static string ConnectionString = null!;
-    internal static string DatabaseName = null!;
-    internal DbContextOptions<StudentDbContext> CosmosOptions = null!;
-    private StudentDbContext _dbContext = null!;
-
     [TestInitialize]
-    public void TestInitialize()
+    public async Task TestInitialize()
     {
-        var configurationBuilder = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+         _studentDbContext = new StudentDbContext(CosmosOptions);
+         await _studentDbContext.Database.EnsureCreatedAsync();
 
-        IConfiguration configuration = configurationBuilder.Build();
-
-        ConnectionString = configuration.GetSection("ConnectionString").Value ?? throw new InvalidOperationException();
-        DatabaseName = configuration.GetSection("DatabaseName").Value ?? throw new InvalidOperationException();
-
-        CosmosOptions = new DbContextOptionsBuilder<StudentDbContext>()
-            .UseCosmos(ConnectionString, DatabaseName)
-            .Options;
- 
-        _dbContext = new StudentDbContext(CosmosOptions);
-        _dbContext.Database.EnsureCreatedAsync();
-
-        _studentRepository = new StudentRepository(_dbContext);
+         _studentRepository = new StudentRepository(_studentDbContext);
     }
 
     [TestCleanup]
     public async Task TestCleanup()
     {
-        using var client = new CosmosClient(ConnectionString);
-        
-        var container = client.GetContainer(DatabaseName, "StudentDbContext");
+        // delete the container
+        var cosmosClient = _studentDbContext.Database.GetCosmosClient();
+        var container = cosmosClient.GetContainer(DatabaseName, "Students");
         await container.DeleteContainerAsync();
 
-        await _dbContext.DisposeAsync();
-        
+        await _studentDbContext.DisposeAsync();
+        await _studentRepository.DisposeAsync();
     }
 
     [TestMethod]
@@ -65,13 +49,14 @@ public class StudentRepositoryTest // : DbTestBase
     {
         var student = CreateStudent();
 
-        var initCountOfStudents = _dbContext.Students.Count();
+        var initCountOfStudents = _studentDbContext.Students.Count();
 
         await _studentRepository.AddAsync(student);
 
-        var finalNumStudents = _dbContext.Students.Count();
+        var finalNumStudents = _studentDbContext.Students.Count();
         
         Assert.AreEqual(initCountOfStudents + 1, finalNumStudents);
+
     }
         
     [TestMethod]
@@ -84,14 +69,15 @@ public class StudentRepositoryTest // : DbTestBase
         var studentFromDb = await _studentRepository.GetByIdAsync(student.Id);
 
         Assert.IsNotNull(studentFromDb);
+        Assert.AreEqual(student.Id, studentFromDb.Id);
     }
 
     [TestMethod]
     public async Task Update_Student_UpdatesStudent()
     {
-        const string updatedFirstName = "Updated First Name";
         
         var student = CreateStudent();
+        const string updatedFirstName = "Updated First Name";
 
         await _studentRepository.AddAsync(student);
 
