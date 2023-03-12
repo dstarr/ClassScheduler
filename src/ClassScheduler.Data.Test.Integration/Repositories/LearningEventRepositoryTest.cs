@@ -40,6 +40,64 @@ public class LearningEventRepositoryTest : DbTestBase
     }
 
     [TestMethod]
+    public async Task CanGetLearningEventByIdAsync()
+    {
+        // arrange
+        var learningEvent = CreateLearningEvent();
+
+        await _learningEventRepository.AddAsync(learningEvent);
+        await _learningEventRepository.SaveChangesAsync();
+
+        // act
+        var learningEventFromDb = await _learningEventRepository.GetByIdAsync(learningEvent.Id);
+
+        // assert
+        Assert.IsNotNull(learningEventFromDb);
+        Assert.AreEqual(learningEvent.Id, learningEventFromDb.Id);
+    }
+
+    [TestMethod]
+    public async Task CanGetAllLearningEventsAsync()
+    {
+        // arrange
+        await _learningEventRepository.AddAsync(CreateLearningEvent());
+        await _learningEventRepository.AddAsync(CreateLearningEvent());
+        await _learningEventRepository.AddAsync(CreateLearningEvent());
+        await _learningEventRepository.AddAsync(CreateLearningEvent());
+        await _learningEventRepository.SaveChangesAsync();
+
+        // act
+        var learningEventsFromDb = await _learningEventRepository.GetAllAsync();
+
+        // assert
+        Assert.IsNotNull(learningEventsFromDb);
+        Assert.IsTrue(learningEventsFromDb.Any());
+        Assert.AreEqual(4, learningEventsFromDb.Count());
+    }
+
+    [TestMethod]
+    public async Task CanUpdateLearningEventAsync()
+    {
+        // arrange
+        var learningEvent = CreateLearningEvent();
+
+        await _learningEventRepository.AddAsync(learningEvent);
+        await _learningEventRepository.SaveChangesAsync();
+
+        // act
+        learningEvent.UpdateTitle("Updated Title");
+        _learningEventRepository.Update(learningEvent);
+        await _learningEventRepository.SaveChangesAsync();
+
+        // assert
+        var learningEventFromDb = await _learningEventRepository.GetByIdAsync(learningEvent.Id);
+
+        Assert.IsNotNull(learningEventFromDb);
+        Assert.AreEqual(learningEvent.Id, learningEventFromDb.Id);
+        Assert.AreEqual("Updated Title", learningEventFromDb.Title);
+    }
+
+    [TestMethod]
     public async Task CanAddLearningEventAsync()
     {
         // arrange

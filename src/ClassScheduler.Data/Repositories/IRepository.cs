@@ -14,6 +14,6 @@ public interface IRepository<T> : IAsyncDisposable where T : class
     void Update(T entity);
     void Remove(T entity);
     Task<T> GetByIdAsync(Guid id);
-    Task<IList<Student>> GetAllAsync();
+    Task<IList<T>> GetAllAsync();
     Task SaveChangesAsync();
 }

@@ -46,6 +46,48 @@ public class LearningEventDbContextTest : DbTestBase
         Assert.AreEqual(0, context.LearningEvents.Count());
     }
 
+    
+
+    [TestMethod]
+    public async Task CanUpdateLearningEventAsync()
+    {
+        var learningEventDto = CreateNewLearningEventDto();
+
+        await using var context = new LearningEventDbContext(_options);
+        await context.Database.EnsureCreatedAsync();
+
+        context.LearningEvents.Add(learningEventDto);
+        await context.SaveChangesAsync();
+
+        Assert.AreEqual(1, context.LearningEvents.Count());
+
+        learningEventDto.Description = "New Description";
+        context.LearningEvents.Update(learningEventDto);
+        await context.SaveChangesAsync();
+
+        Assert.AreEqual(1, context.LearningEvents.Count());
+        Assert.AreEqual("New Description", context.LearningEvents.First().Description);
+    }
+
+    [TestMethod]
+    public async Task CanAddAndRemoveLearningEventAsync()
+    {
+        var learningEventDto = CreateNewLearningEventDto();
+
+        await using var context = new LearningEventDbContext(_options);
+        await context.Database.EnsureCreatedAsync();
+
+        context.LearningEvents.Add(learningEventDto);
+        await context.SaveChangesAsync();
+
+        Assert.AreEqual(1, context.LearningEvents.Count());
+        
+        context.LearningEvents.Remove(learningEventDto);
+        await context.SaveChangesAsync();
+
+        Assert.AreEqual(0, context.LearningEvents.Count());
+    }
+
     private LearningEventDto CreateNewLearningEventDto()
     {
         var studentIds = new List<string>()
