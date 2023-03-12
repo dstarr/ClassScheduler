@@ -7,7 +7,7 @@ using ClassScheduler.Domain.Entities;
 
 namespace ClassScheduler.Data.Repositories;
 
-public interface IStudentRepository : IRepository<Student>, IAsyncDisposable
+public interface IStudentRepository : IRepository<Student>
 {
     
 }

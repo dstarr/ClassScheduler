@@ -8,7 +8,7 @@ using ClassScheduler.Domain.Entities;
 
 namespace ClassScheduler.Data.Repositories;
 
-public interface IRepository<T> where T : class
+public interface IRepository<T> : IAsyncDisposable where T : class
 {
     Task<T> AddAsync(T entity);
     void Update(T entity);
