@@ -39,7 +39,6 @@ public class LearningEventRepositoryTest : DbTestBase
         await _learningEventDbContext.DisposeAsync();
         await _learningEventRepository.DisposeAsync();
         
-        
     }
 
     [TestMethod]
@@ -97,7 +96,6 @@ public class LearningEventRepositoryTest : DbTestBase
         Assert.IsNull(learningEventFromDb);
     }
 
-
     [TestMethod]
     public async Task CanUpdateLearningEventAsync()
     {
@@ -113,12 +111,13 @@ public class LearningEventRepositoryTest : DbTestBase
         await _learningEventRepository.SaveChangesAsync();
 
         // act
-        
         learningEvent.UpdateTitle(updatedTitle);
         learningEvent.UpdateDescription(updatedDescription);
         learningEvent.UpdateStartAndEndTimes(startTime, endTime);
         learningEvent.UpdateStudentCapacity(20);
         learningEvent.UpdateTotalHours(20);
+        learningEvent.AddStudent(StudentRepositoryTest.CreateStudent());
+        learningEvent.AddStudent(StudentRepositoryTest.CreateStudent());
 
         _learningEventRepository.Update(learningEvent);
         await _learningEventRepository.SaveChangesAsync();
@@ -134,6 +133,7 @@ public class LearningEventRepositoryTest : DbTestBase
         Assert.AreEqual(endTime, learningEventFromDb.EndTime);
         Assert.AreEqual(20, learningEventFromDb.StudentCapacity);
         Assert.AreEqual(20, learningEventFromDb.TotalHours);
+        Assert.AreEqual(2, learningEventFromDb.Students.Count);
     }
 
     [TestMethod]
@@ -154,7 +154,7 @@ public class LearningEventRepositoryTest : DbTestBase
         Assert.AreEqual(initCountOfLearningEvents + 1, finalNumLearningEvents);
     }
 
-    private LearningEvent CreateLearningEvent()
+    internal static LearningEvent CreateLearningEvent()
     {
         var learningEventArgs = new LearningEventArgs()
         {

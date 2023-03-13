@@ -123,7 +123,7 @@ public class StudentRepositoryTest : DbTestBase
         Assert.IsNull(studentFromDb);
     }
 
-    private static Student CreateStudent()
+    public static Student CreateStudent()
     {
         return new Student(Guid.NewGuid(), "FirstName", "LastName", "test@test.com");
     }
