@@ -3,30 +3,33 @@ using ClassScheduler.Data.Dto;
 using ClassScheduler.Data.Mappers;
 using ClassScheduler.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace ClassScheduler.Data.Repositories;
 
 public class LearningEventRepository : ILearningEventRepository
 {
-    private readonly LearningEventDbContext _dbContext;
+    private readonly LearningEventDbContext _learningEventDbContext;
+    private readonly StudentDbContext _studentDbContext;
 
-    public LearningEventRepository(LearningEventDbContext dbContext)
+    public LearningEventRepository(LearningEventDbContext learningEventDbContext, StudentDbContext studentDbContext)
     {
-        _dbContext = dbContext;
+        _learningEventDbContext = learningEventDbContext;
+        _studentDbContext = studentDbContext;
     }
 
     public async Task AddAsync(LearningEvent entity)
     {
         var toDto = LearningEventMapper.MapEntityToDto(entity);
 
-        await _dbContext.Set<LearningEventDto>().AddAsync(toDto);
+        await _learningEventDbContext.Set<LearningEventDto>().AddAsync(toDto);
 
-        await _dbContext.SaveChangesAsync();
+        await _learningEventDbContext.SaveChangesAsync();
     }
 
-    public void Update(LearningEvent entity)
+    public async Task UpdateAsync(LearningEvent entity)
     {
-        var dto = _dbContext.LearningEvents.FirstOrDefault(u => u.Id == entity.Id);
+        var dto = _learningEventDbContext.LearningEvents.FirstOrDefault(u => u.Id == entity.Id);
 
         if (dto == null) return;
 
@@ -39,44 +42,67 @@ public class LearningEventRepository : ILearningEventRepository
         dto.StudentIds = dto.StudentIds;
         dto.Title = entity.Title;
 
-        _dbContext.Set<LearningEventDto>().Update(dto);
-        _dbContext.SaveChangesAsync();
+        // _learningEventDbContext.Set<LearningEventDto>().Update(dto);
+        await _learningEventDbContext.SaveChangesAsync();
     }
 
-    public void Remove(Guid id)
+    public async Task DeleteAsync(Guid id)
     {
-        var dto = _dbContext.LearningEvents.FirstOrDefault(u => u.Id == id);    
+        var dto = _learningEventDbContext.LearningEvents.FirstOrDefault(u => u.Id == id);    
 
         if (dto == null) return;
 
-        _dbContext.Set<LearningEventDto>().Remove(dto);
+        _learningEventDbContext.Set<LearningEventDto>().Remove(dto);
 
-        _dbContext.SaveChangesAsync();
+        await _learningEventDbContext.SaveChangesAsync();
     }
 
 
     public async Task<LearningEvent> GetByIdAsync(Guid id)
     {
-        var dto = await _dbContext.LearningEvents.FirstOrDefaultAsync(s => s.Id == id);
+        var dto = await _learningEventDbContext.LearningEvents
+            .SingleOrDefaultAsync(s => s.Id == id);
 
         if (dto == null) return null!;
 
-        return LearningEventMapper.MapDtoToEntity(dto);
+        IList<Student> students = GetStudentsList(dto);
+
+        return LearningEventMapper.MapDtoToEntity(dto, students);
     }
-     
+
 
     public async Task<IList<LearningEvent>> GetAllAsync()
     {
-        var dtos = await _dbContext.LearningEvents.ToListAsync();
+        var dtos = await _learningEventDbContext.LearningEvents.ToListAsync();
 
-        var entities = dtos.Select(dto => LearningEventMapper.MapDtoToEntity(dto)).ToList();
+        List<LearningEvent> entities = new List<LearningEvent>();
+
+        foreach (var dto in dtos)
+        {
+            IList<Student> students = GetStudentsList(dto);
+            var entity= dtos.Select(learningEventDto => LearningEventMapper.MapDtoToEntity(learningEventDto, students)).FirstOrDefault();
+
+            if (entity != null)
+            {
+                entities.Add(entity);
+            }
+        }
 
         return entities;
     }
 
     public async ValueTask DisposeAsync()
     {
-        await _dbContext.DisposeAsync();
+        await _learningEventDbContext.DisposeAsync();
     }
+    private List<Student> GetStudentsList(LearningEventDto dto)
+    {
+        return dto.StudentIds
+            .Select(studentId => _studentDbContext.Students
+                .FirstOrDefault(s => s.Id == Guid.Parse(studentId)))
+            .Select(studentDto => StudentMapper.MapDtoToEntity(studentDto))
+            .ToList();
+    }
+
 
 }

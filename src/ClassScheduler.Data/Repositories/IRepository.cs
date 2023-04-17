@@ -12,9 +12,9 @@ public interface IRepository<T> : IAsyncDisposable where T : class
 {
     Task AddAsync(T entity);
     
-    void Update(T entity);
+    Task UpdateAsync(T entity);
     
-    void Remove(Guid id);
+    Task DeleteAsync(Guid id);
 
     Task<T> GetByIdAsync(Guid id);
     

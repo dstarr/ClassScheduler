@@ -14,10 +14,7 @@ public class LearningEventRepositoryTest : DbTestBase
     private LearningEventDbContext _learningEventDbContext = null!;
 
     private LearningEventRepository _learningEventRepository = null!;
-
-    private StudentDbContext _studentDbContext = null!;
-
-    private StudentRepository _studentRepository = null!;
+    private StudentDbContext _studentDbContext;
 
     [TestInitialize]
     public async Task TestInitialize()
@@ -29,15 +26,13 @@ public class LearningEventRepositoryTest : DbTestBase
         _learningEventDbContext = new LearningEventDbContext(leCosmosOptions);
         await _learningEventDbContext.Database.EnsureCreatedAsync();
 
-        var sCosmosOptions = new DbContextOptionsBuilder<StudentDbContext>()
+        var studentCosmosOptions = new DbContextOptionsBuilder<StudentDbContext>()
             .UseCosmos(ConnectionString, DatabaseName)
             .Options;
-        
-        _studentDbContext = new StudentDbContext(sCosmosOptions);
-        await _studentDbContext.Database.EnsureCreatedAsync();
 
-        _learningEventRepository = new LearningEventRepository(_learningEventDbContext);
-        _studentRepository = new StudentRepository(_studentDbContext);
+        _studentDbContext = new StudentDbContext(studentCosmosOptions);
+
+        _learningEventRepository = new LearningEventRepository(_learningEventDbContext, _studentDbContext);
     }
 
     [TestCleanup]
@@ -88,7 +83,7 @@ public class LearningEventRepositoryTest : DbTestBase
     }
 
     [TestMethod]
-        public async Task CanRemoveLearningEventAsync()
+    public async Task CanDeleteLearningEventAsync()
     {
         // arrange
         var learningEvent = CreateLearningEvent();
@@ -96,7 +91,7 @@ public class LearningEventRepositoryTest : DbTestBase
         await _learningEventRepository.AddAsync(learningEvent);
 
         // act
-        _learningEventRepository.Remove(learningEvent.Id);
+        await _learningEventRepository.DeleteAsync(learningEvent.Id);
 
         // assert
         var learningEventFromDb = await _learningEventRepository.GetByIdAsync(learningEvent.Id);
@@ -126,7 +121,7 @@ public class LearningEventRepositoryTest : DbTestBase
         learningEvent.AddStudent(StudentRepositoryTest.CreateStudent());
         learningEvent.AddStudent(StudentRepositoryTest.CreateStudent());
 
-        _learningEventRepository.Update(learningEvent);
+        await _learningEventRepository.UpdateAsync(learningEvent);
 
         // assert
         var learningEventFromDb = await _learningEventRepository.GetByIdAsync(learningEvent.Id);

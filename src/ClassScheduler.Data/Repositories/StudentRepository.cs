@@ -25,7 +25,7 @@ public class StudentRepository : IStudentRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public void Update(Student student)
+    public async Task UpdateAsync(Student student)
     {
         var dto = _dbContext.Students.FirstOrDefault(u => u.Id == student.Id);
 
@@ -34,13 +34,14 @@ public class StudentRepository : IStudentRepository
         dto.FirstName = student.FirstName;
         dto.LastName = student.LastName;
         dto.Email = student.Email;
+        dto.PartitionKey = "/id";
 
         _dbContext.Students.Update(dto);
 
-        _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
     }
 
-    public void Remove(Guid id)
+    public async Task DeleteAsync(Guid id)
     {
         var dto = _dbContext.Students.FirstOrDefault(u => u.Id == id);
     
@@ -49,8 +50,7 @@ public class StudentRepository : IStudentRepository
 
         _dbContext.Set<StudentDto>().Remove(dto);
 
-        _dbContext.Students.Remove(dto);
-        _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<Student> GetByIdAsync(Guid id)

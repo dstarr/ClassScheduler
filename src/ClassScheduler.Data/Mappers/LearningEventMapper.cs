@@ -6,7 +6,7 @@ namespace ClassScheduler.Data.Mappers;
 
 public static class LearningEventMapper
 {
-    public static LearningEvent MapDtoToEntity(LearningEventDto dto)
+    public static LearningEvent MapDtoToEntity(LearningEventDto dto, IList<Student> students)
     {
         var args = new LearningEventArgs()
         {
@@ -17,6 +17,7 @@ public static class LearningEventMapper
             MaxStudents = dto.StudentCapacity,
             Title = dto.Title,
             TotalHours = dto.TotalHours,
+            Students = students.ToList()
         };
 
         return new LearningEvent(args);

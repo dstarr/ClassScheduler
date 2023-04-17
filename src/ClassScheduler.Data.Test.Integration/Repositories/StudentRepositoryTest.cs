@@ -94,7 +94,7 @@ public class StudentRepositoryTest : DbTestBase
         // act
         student.UpdateFirstName(updatedFirstName);
 
-        _studentRepository.Update(student);
+        await _studentRepository.UpdateAsync(student);
 
         var studentFromDb = await _studentRepository.GetByIdAsync(student.Id);
 
@@ -102,19 +102,17 @@ public class StudentRepositoryTest : DbTestBase
     }
 
     [TestMethod]
-    public async Task CanRemoveStudentAsync()
+    public async Task CanDeleteStudentAsync()
     {
         var student = CreateStudent();
 
         await _studentRepository.AddAsync(student);
 
-        Thread.Sleep(100);
-
-        _studentRepository.Remove(student.Id);
+        await _studentRepository.DeleteAsync(student.Id);
 
         var studentFromDb = await _studentRepository.GetByIdAsync(student.Id);
 
-        Assert.IsNotNull(studentFromDb);
+        Assert.IsNull(studentFromDb);
     }
 
     public static Student CreateStudent()
