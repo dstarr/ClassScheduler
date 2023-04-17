@@ -1,4 +1,5 @@
 ﻿using ClassScheduler.Data.DbContexts;
+using ClassScheduler.Data.Dto;
 using ClassScheduler.Data.Mappers;
 using ClassScheduler.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +15,13 @@ public class LearningEventRepository : ILearningEventRepository
         _dbContext = dbContext;
     }
 
-    public async Task<LearningEvent> AddAsync(LearningEvent entity)
+    public async Task AddAsync(LearningEvent entity)
     {
         var toDto = LearningEventMapper.MapEntityToDto(entity);
 
-        var fromDto = (await _dbContext.LearningEvents.AddAsync(toDto)).Entity;
+        await _dbContext.Set<LearningEventDto>().AddAsync(toDto);
 
-        var learningEvent = LearningEventMapper.MapDtoToEntity(fromDto);
-
-        return learningEvent;
+        await _dbContext.SaveChangesAsync();
     }
 
     public void Update(LearningEvent entity)
@@ -40,16 +39,19 @@ public class LearningEventRepository : ILearningEventRepository
         dto.StudentIds = dto.StudentIds;
         dto.Title = entity.Title;
 
-        _dbContext.LearningEvents.Update(dto);
+        _dbContext.Set<LearningEventDto>().Update(dto);
+        _dbContext.SaveChangesAsync();
     }
 
-    public void Remove(LearningEvent entity)
+    public void Remove(Guid id)
     {
-        var dto = _dbContext.LearningEvents.FirstOrDefault(u => u.Id == entity.Id);
+        var dto = _dbContext.LearningEvents.FirstOrDefault(u => u.Id == id);    
 
         if (dto == null) return;
 
-        _dbContext.LearningEvents.Remove(dto);
+        _dbContext.Set<LearningEventDto>().Remove(dto);
+
+        _dbContext.SaveChangesAsync();
     }
 
 
@@ -71,12 +73,6 @@ public class LearningEventRepository : ILearningEventRepository
 
         return entities;
     }
-
-    public async Task SaveChangesAsync()
-    {
-        await _dbContext.SaveChangesAsync();
-    }
-
 
     public async ValueTask DisposeAsync()
     {

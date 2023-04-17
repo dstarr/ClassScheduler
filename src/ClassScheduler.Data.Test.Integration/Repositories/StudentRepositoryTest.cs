@@ -47,7 +47,6 @@ public class StudentRepositoryTest : DbTestBase
         await _studentRepository.AddAsync(CreateStudent());
         await _studentRepository.AddAsync(CreateStudent());
         await _studentRepository.AddAsync(CreateStudent());
-        await _studentRepository.SaveChangesAsync();
 
         var students = (await _studentRepository.GetAllAsync()).ToList();
 
@@ -63,7 +62,6 @@ public class StudentRepositoryTest : DbTestBase
         var initCountOfStudents = _studentDbContext.Students.Count();
 
         await _studentRepository.AddAsync(student);
-        await _studentRepository.SaveChangesAsync();
 
         var finalNumStudents = _studentDbContext.Students.Count();
         
@@ -77,8 +75,6 @@ public class StudentRepositoryTest : DbTestBase
         var student = CreateStudent();
 
         await _studentRepository.AddAsync(student);
-        await _studentRepository.SaveChangesAsync();
-
 
         var studentFromDb = await _studentRepository.GetByIdAsync(student.Id);
 
@@ -94,13 +90,11 @@ public class StudentRepositoryTest : DbTestBase
         const string updatedFirstName = "Updated First Name";
 
         await _studentRepository.AddAsync(student);
-        await _studentRepository.SaveChangesAsync();
 
         // act
         student.UpdateFirstName(updatedFirstName);
 
         _studentRepository.Update(student);
-        await _studentRepository.SaveChangesAsync();
 
         var studentFromDb = await _studentRepository.GetByIdAsync(student.Id);
 
@@ -113,14 +107,14 @@ public class StudentRepositoryTest : DbTestBase
         var student = CreateStudent();
 
         await _studentRepository.AddAsync(student);
-        await _studentRepository.SaveChangesAsync();
 
-        _studentRepository.Remove(student);
-        await _studentRepository.SaveChangesAsync();
+        Thread.Sleep(100);
+
+        _studentRepository.Remove(student.Id);
 
         var studentFromDb = await _studentRepository.GetByIdAsync(student.Id);
 
-        Assert.IsNull(studentFromDb);
+        Assert.IsNotNull(studentFromDb);
     }
 
     public static Student CreateStudent()

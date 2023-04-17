@@ -10,10 +10,13 @@ namespace ClassScheduler.Data.Repositories;
 
 public interface IRepository<T> : IAsyncDisposable where T : class
 {
-    Task<T> AddAsync(T entity);
+    Task AddAsync(T entity);
+    
     void Update(T entity);
-    void Remove(T entity);
+    
+    void Remove(Guid id);
+
     Task<T> GetByIdAsync(Guid id);
+    
     Task<IList<T>> GetAllAsync();
-    Task SaveChangesAsync();
 }

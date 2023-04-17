@@ -16,15 +16,13 @@ public class StudentRepository : IStudentRepository
         _dbContext.Database.EnsureCreatedAsync();
     }
 
-    public async Task<Student> AddAsync(Student entity)
+    public async Task AddAsync(Student entity)
     {
         var toDto = StudentMapper.MapEntityToDto(entity);
 
-        var fromDto = (await _dbContext.Students.AddAsync(toDto)).Entity;
-        
-        var student = StudentMapper.MapDtoToEntity(fromDto);
+        await _dbContext.Students.AddAsync(toDto);
 
-        return student;
+        await _dbContext.SaveChangesAsync();
     }
 
     public void Update(Student student)
@@ -38,14 +36,21 @@ public class StudentRepository : IStudentRepository
         dto.Email = student.Email;
 
         _dbContext.Students.Update(dto);
+
+        _dbContext.SaveChangesAsync();
     }
 
-    public void Remove(Student entity)
+    public void Remove(Guid id)
     {
-        var dto = _dbContext.Students.FirstOrDefault(u => u.Id == entity.Id);
+        var dto = _dbContext.Students.FirstOrDefault(u => u.Id == id);
+    
         if (dto == null) return;
 
+
+        _dbContext.Set<StudentDto>().Remove(dto);
+
         _dbContext.Students.Remove(dto);
+        _dbContext.SaveChangesAsync();
     }
 
     public async Task<Student> GetByIdAsync(Guid id)
@@ -70,11 +75,6 @@ public class StudentRepository : IStudentRepository
         }
 
         return students;
-    }
-
-    public async Task SaveChangesAsync()
-    {
-        await _dbContext.SaveChangesAsync();
     }
 
     public async ValueTask DisposeAsync()

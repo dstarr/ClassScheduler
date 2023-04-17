@@ -15,17 +15,29 @@ public class LearningEventRepositoryTest : DbTestBase
 
     private LearningEventRepository _learningEventRepository = null!;
 
+    private StudentDbContext _studentDbContext = null!;
+
+    private StudentRepository _studentRepository = null!;
+
     [TestInitialize]
     public async Task TestInitialize()
     {
-        var cosmosOptions = new DbContextOptionsBuilder<LearningEventDbContext>()
+        var leCosmosOptions = new DbContextOptionsBuilder<LearningEventDbContext>()
             .UseCosmos(ConnectionString, DatabaseName)
             .Options;
 
-        _learningEventDbContext = new LearningEventDbContext(cosmosOptions);
+        _learningEventDbContext = new LearningEventDbContext(leCosmosOptions);
         await _learningEventDbContext.Database.EnsureCreatedAsync();
 
+        var sCosmosOptions = new DbContextOptionsBuilder<StudentDbContext>()
+            .UseCosmos(ConnectionString, DatabaseName)
+            .Options;
+        
+        _studentDbContext = new StudentDbContext(sCosmosOptions);
+        await _studentDbContext.Database.EnsureCreatedAsync();
+
         _learningEventRepository = new LearningEventRepository(_learningEventDbContext);
+        _studentRepository = new StudentRepository(_studentDbContext);
     }
 
     [TestCleanup]
@@ -48,7 +60,6 @@ public class LearningEventRepositoryTest : DbTestBase
         var learningEvent = CreateLearningEvent();
 
         await _learningEventRepository.AddAsync(learningEvent);
-        await _learningEventRepository.SaveChangesAsync();
 
         // act
         var learningEventFromDb = await _learningEventRepository.GetByIdAsync(learningEvent.Id);
@@ -66,7 +77,6 @@ public class LearningEventRepositoryTest : DbTestBase
         await _learningEventRepository.AddAsync(CreateLearningEvent());
         await _learningEventRepository.AddAsync(CreateLearningEvent());
         await _learningEventRepository.AddAsync(CreateLearningEvent());
-        await _learningEventRepository.SaveChangesAsync();
 
         // act
         var learningEventsFromDb = await _learningEventRepository.GetAllAsync();
@@ -78,17 +88,15 @@ public class LearningEventRepositoryTest : DbTestBase
     }
 
     [TestMethod]
-    public async Task CanRemoveLearningEventAsync()
+        public async Task CanRemoveLearningEventAsync()
     {
         // arrange
         var learningEvent = CreateLearningEvent();
 
         await _learningEventRepository.AddAsync(learningEvent);
-        await _learningEventRepository.SaveChangesAsync();
 
         // act
-        _learningEventRepository.Remove(learningEvent);
-        await _learningEventRepository.SaveChangesAsync();
+        _learningEventRepository.Remove(learningEvent.Id);
 
         // assert
         var learningEventFromDb = await _learningEventRepository.GetByIdAsync(learningEvent.Id);
@@ -108,7 +116,6 @@ public class LearningEventRepositoryTest : DbTestBase
         var learningEvent = CreateLearningEvent();
 
         await _learningEventRepository.AddAsync(learningEvent);
-        await _learningEventRepository.SaveChangesAsync();
 
         // act
         learningEvent.UpdateTitle(updatedTitle);
@@ -120,7 +127,6 @@ public class LearningEventRepositoryTest : DbTestBase
         learningEvent.AddStudent(StudentRepositoryTest.CreateStudent());
 
         _learningEventRepository.Update(learningEvent);
-        await _learningEventRepository.SaveChangesAsync();
 
         // assert
         var learningEventFromDb = await _learningEventRepository.GetByIdAsync(learningEvent.Id);
@@ -142,14 +148,14 @@ public class LearningEventRepositoryTest : DbTestBase
         // arrange
         var learningEvent = CreateLearningEvent();
 
-        var initCountOfLearningEvents = _learningEventDbContext.LearningEvents.Count();
+        var initCountOfLearningEvents = (await _learningEventRepository.GetAllAsync()).Count;
 
         // act
         await _learningEventRepository.AddAsync(learningEvent);
-        await _learningEventRepository.SaveChangesAsync();
 
         // assert
-        var finalNumLearningEvents = _learningEventDbContext.LearningEvents.Count();
+        var finalNumLearningEvents = (await _learningEventRepository.GetAllAsync()).Count;
+
 
         Assert.AreEqual(initCountOfLearningEvents + 1, finalNumLearningEvents);
     }
