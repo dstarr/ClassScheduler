@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Runtime.CompilerServices;
-using ClassScheduler.Data.DbContexts;
+﻿using ClassScheduler.Data.DbContexts;
 using ClassScheduler.Data.Repositories;
 using ClassScheduler.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -10,42 +8,32 @@ namespace ClassScheduler.Data.Test.Integration.Repositories;
 [TestClass()]
 public class LearningEventRepositoryTest : DbTestBase
 {
-
-    private LearningEventDbContext _learningEventDbContext = null!;
-
     private LearningEventRepository _learningEventRepository = null!;
-    private StudentDbContext _studentDbContext;
+    private AppDbContext _dbContext = null!;
 
     [TestInitialize]
     public async Task TestInitialize()
     {
-        var leCosmosOptions = new DbContextOptionsBuilder<LearningEventDbContext>()
+        var cosmosOptions = new DbContextOptionsBuilder<AppDbContext>()
             .UseCosmos(ConnectionString, DatabaseName)
             .Options;
 
-        _learningEventDbContext = new LearningEventDbContext(leCosmosOptions);
-        await _learningEventDbContext.Database.EnsureCreatedAsync();
+        _dbContext = new AppDbContext(cosmosOptions);
+        await _dbContext.Database.EnsureCreatedAsync();
 
-        var studentCosmosOptions = new DbContextOptionsBuilder<StudentDbContext>()
-            .UseCosmos(ConnectionString, DatabaseName)
-            .Options;
-
-        _studentDbContext = new StudentDbContext(studentCosmosOptions);
-
-        _learningEventRepository = new LearningEventRepository(_learningEventDbContext, _studentDbContext);
+        _learningEventRepository = new LearningEventRepository(_dbContext);
     }
 
     [TestCleanup]
     public async Task TestCleanup()
     {
         // delete the container
-        var cosmosClient = _learningEventDbContext.Database.GetCosmosClient();
+        var cosmosClient = _dbContext.Database.GetCosmosClient();
         var container = cosmosClient.GetContainer(DatabaseName, "LearningEvents");
         await container.DeleteContainerAsync();
 
-        await _learningEventDbContext.DisposeAsync();
+        await _dbContext.DisposeAsync();
         await _learningEventRepository.DisposeAsync();
-        
     }
 
     [TestMethod]
@@ -112,14 +100,16 @@ public class LearningEventRepositoryTest : DbTestBase
 
         await _learningEventRepository.AddAsync(learningEvent);
 
+        learningEvent = await _learningEventRepository.GetByIdAsync(learningEvent.Id);
+
         // act
         learningEvent.UpdateTitle(updatedTitle);
         learningEvent.UpdateDescription(updatedDescription);
         learningEvent.UpdateStartAndEndTimes(startTime, endTime);
         learningEvent.UpdateStudentCapacity(20);
         learningEvent.UpdateTotalHours(20);
-        learningEvent.AddStudent(StudentRepositoryTest.CreateStudent());
-        learningEvent.AddStudent(StudentRepositoryTest.CreateStudent());
+        learningEvent.AddStudent(CreateStudent());
+        learningEvent.AddStudent(CreateStudent());
 
         await _learningEventRepository.UpdateAsync(learningEvent);
 
@@ -127,6 +117,7 @@ public class LearningEventRepositoryTest : DbTestBase
         var learningEventFromDb = await _learningEventRepository.GetByIdAsync(learningEvent.Id);
 
         Assert.IsNotNull(learningEventFromDb);
+
         Assert.AreEqual(learningEvent.Id, learningEventFromDb.Id);
         Assert.AreEqual(updatedTitle, learningEventFromDb.Title);
         Assert.AreEqual(updatedDescription, learningEventFromDb.Description);
@@ -151,11 +142,10 @@ public class LearningEventRepositoryTest : DbTestBase
         // assert
         var finalNumLearningEvents = (await _learningEventRepository.GetAllAsync()).Count;
 
-
         Assert.AreEqual(initCountOfLearningEvents + 1, finalNumLearningEvents);
     }
 
-    internal static LearningEvent CreateLearningEvent()
+    private static LearningEvent CreateLearningEvent()
     {
         var learningEventArgs = new LearningEventArgs()
         {
@@ -173,4 +163,9 @@ public class LearningEventRepositoryTest : DbTestBase
         { };
     }
 
+    private static Student CreateStudent()
+    {
+        return new Student(Guid.NewGuid(), "First Name", "Last Name", "test@test.com")
+        {};
+    }
 }

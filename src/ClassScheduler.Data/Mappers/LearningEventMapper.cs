@@ -6,7 +6,7 @@ namespace ClassScheduler.Data.Mappers;
 
 public static class LearningEventMapper
 {
-    public static LearningEvent MapDtoToEntity(LearningEventDto dto, IList<Student> students)
+    public static LearningEvent MapDtoToEntity(LearningEventDto dto, List<Student> students)
     {
         var args = new LearningEventArgs()
         {

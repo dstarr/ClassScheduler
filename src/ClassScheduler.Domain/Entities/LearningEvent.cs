@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using ClassScheduler.Domain.Exceptions;
-
+﻿using ClassScheduler.Domain.Exceptions;
 
 namespace ClassScheduler.Domain.Entities;
 

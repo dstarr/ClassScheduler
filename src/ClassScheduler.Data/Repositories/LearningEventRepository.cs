@@ -3,35 +3,51 @@ using ClassScheduler.Data.Dto;
 using ClassScheduler.Data.Mappers;
 using ClassScheduler.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
+using static ClassScheduler.Data.Mappers.LearningEventMapper;
 
 namespace ClassScheduler.Data.Repositories;
 
 public class LearningEventRepository : ILearningEventRepository
 {
-    private readonly LearningEventDbContext _learningEventDbContext;
-    private readonly StudentDbContext _studentDbContext;
+    private readonly AppDbContext _dbContext;
 
-    public LearningEventRepository(LearningEventDbContext learningEventDbContext, StudentDbContext studentDbContext)
+    public LearningEventRepository(AppDbContext dbContext)
     {
-        _learningEventDbContext = learningEventDbContext;
-        _studentDbContext = studentDbContext;
+        _dbContext = dbContext;
     }
 
     public async Task AddAsync(LearningEvent entity)
     {
-        var toDto = LearningEventMapper.MapEntityToDto(entity);
+        var toDto = MapEntityToDto(entity);
 
-        await _learningEventDbContext.Set<LearningEventDto>().AddAsync(toDto);
+        var studentDtos = new List<StudentDto>();
+        foreach (var student in entity.Students)
+        {
+            var studentDto = await _dbContext.Students.FirstOrDefaultAsync();
+            
+            if (studentDto == null)
+            {
+                studentDto = StudentMapper.MapEntityToDto(student);
+            }
 
-        await _learningEventDbContext.SaveChangesAsync();
+            studentDtos.Add(studentDto);
+        }
+
+        await _dbContext.Set<LearningEventDto>().AddAsync(toDto);
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(LearningEvent entity)
     {
-        var dto = _learningEventDbContext.LearningEvents.FirstOrDefault(u => u.Id == entity.Id);
+        var dto = _dbContext.LearningEvents.FirstOrDefault(u => u.Id == entity.Id);
 
         if (dto == null) return;
+
+        var studentIds = new List<string>();
+        foreach (var student in entity.Students)
+        {
+            studentIds.Add(student.Id.ToString());            
+        }
 
         dto.EndTime = entity.EndTime;
         dto.StartTime = entity.StartTime;
@@ -39,70 +55,65 @@ public class LearningEventRepository : ILearningEventRepository
         dto.Description = entity.Description;
         dto.StudentCapacity = entity.StudentCapacity;
         dto.TotalHours = entity.TotalHours;
-        dto.StudentIds = dto.StudentIds;
+        dto.StudentIds = studentIds;
         dto.Title = entity.Title;
 
-        // _learningEventDbContext.Set<LearningEventDto>().Update(dto);
-        await _learningEventDbContext.SaveChangesAsync();
+        // _dbContext.Set<LearningEventDto>().Update(dto);
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(Guid id)
     {
-        var dto = _learningEventDbContext.LearningEvents.FirstOrDefault(u => u.Id == id);    
+        var dto = _dbContext.LearningEvents.FirstOrDefault(u => u.Id == id);    
 
         if (dto == null) return;
 
-        _learningEventDbContext.Set<LearningEventDto>().Remove(dto);
+        _dbContext.Set<LearningEventDto>().Remove(dto);
 
-        await _learningEventDbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
     }
 
 
     public async Task<LearningEvent> GetByIdAsync(Guid id)
     {
-        var dto = await _learningEventDbContext.LearningEvents
+        var dto = await _dbContext.LearningEvents
             .SingleOrDefaultAsync(s => s.Id == id);
-
+        
         if (dto == null) return null!;
+        
+        var studentDtos = await _dbContext.Students.ToListAsync();
 
-        IList<Student> students = GetStudentsList(dto);
-
+        var students = studentDtos.Select(StudentMapper.MapDtoToEntity).ToList();
+        
         return LearningEventMapper.MapDtoToEntity(dto, students);
     }
 
 
     public async Task<IList<LearningEvent>> GetAllAsync()
     {
-        var dtos = await _learningEventDbContext.LearningEvents.ToListAsync();
-
-        List<LearningEvent> entities = new List<LearningEvent>();
-
+        var dtos = await _dbContext.LearningEvents.ToListAsync();
+        
+        var entities = new List<LearningEvent>();
+        
         foreach (var dto in dtos)
         {
-            IList<Student> students = GetStudentsList(dto);
-            var entity= dtos.Select(learningEventDto => LearningEventMapper.MapDtoToEntity(learningEventDto, students)).FirstOrDefault();
+            var studentDtos = _dbContext.Students.ToList();
+
+            var students = studentDtos.Select(StudentMapper.MapDtoToEntity).ToList();
+        
+            var entity= dtos.Select(learningEventDto => MapDtoToEntity(learningEventDto, students)).FirstOrDefault();
 
             if (entity != null)
             {
                 entities.Add(entity);
             }
         }
-
+        
         return entities;
     }
 
     public async ValueTask DisposeAsync()
     {
-        await _learningEventDbContext.DisposeAsync();
+        await _dbContext.DisposeAsync();
     }
-    private List<Student> GetStudentsList(LearningEventDto dto)
-    {
-        return dto.StudentIds
-            .Select(studentId => _studentDbContext.Students
-                .FirstOrDefault(s => s.Id == Guid.Parse(studentId)))
-            .Select(studentDto => StudentMapper.MapDtoToEntity(studentDto))
-            .ToList();
-    }
-
-
 }
